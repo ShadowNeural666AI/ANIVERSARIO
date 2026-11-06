@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarjeta 3 - Celestial Starry Night</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Great+Vibes&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 900px;
+      height: 1350px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card-standalone-root {
+      width: 900px;
+      height: 1350px;
+      position: relative;
+      border-radius: 36px;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 40px rgba(212, 175, 55, 0.3);
+    }
+
+    .card-gold-corners {
+      position: absolute;
+      inset: 22px;
+      pointer-events: none;
+    }
+    .card-gold-corners::before, .card-gold-corners::after,
+    .corner-bottom-left, .corner-bottom-right {
+      content: "";
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 2px solid #ffd700;
+    }
+    .card-gold-corners::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .card-gold-corners::after { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .corner-bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+    .corner-bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+    .card-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 30px;
+      background: rgba(58, 6, 26, 0.9);
+      border: 1.8px solid #ffd700;
+      border-radius: 999px;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 12px rgba(255, 215, 0, 0.25);
+    }
+    .card-badge-pill span {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff9e6;
+      letter-spacing: 0.16em;
+    }
+
+    .card-header-block {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .card-script-eyebrow {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.8rem;
+      color: #f5d77f;
+      line-height: 1;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+    .card-names-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(180deg, #ffffff 0%, #fff4cc 30%, #ffd700 70%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 20px rgba(255, 215, 0, 0.7));
+      margin: 4px 0 10px 0;
+    }
+
+    .card-intertwined-hearts {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .card-divider-line {
+      width: 100px;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    }
+
+    /* QR Code Display Container */
+    .qr-frame-wrapper {
+      position: relative;
+      padding: 16px;
+      background: linear-gradient(135deg, #fff2cc 0%, #ffd700 50%, #b8860b 100%);
+      border-radius: 28px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.65);
+      margin: 15px 0;
+    }
+    .qr-frame-inner {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .qr-image {
+      width: 380px;
+      height: 380px;
+      display: block;
+      border-radius: 12px;
+    }
+    .qr-center-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle at 35% 35%, #ff4d6d, #b5173f 60%, #500718 100%);
+      border: 3px solid #ffd700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.8);
+      font-size: 1.8rem;
+      color: #ffffff;
+    }
+
+    .card-instructions {
+      text-align: center;
+      max-width: 680px;
+    }
+    .card-instructions .inst-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: #fff8e7;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    }
+    .card-instructions .inst-quote {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.1rem;
+      color: #ffd700;
+      line-height: 1.2;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+      margin-bottom: 6px;
+    }
+    .card-instructions .inst-hint {
+      font-size: 1.05rem;
+      color: #ffb3c6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .card-footer-signoff {
+      width: 100%;
+      border-top: 1px solid rgba(212, 175, 55, 0.35);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e5b366;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+    .card-footer-signoff .footer-sig {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.2rem;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    }
+
+    
+    .card-celestial-stars {
+      background: radial-gradient(circle at 50% 15%, #2a0845 0%, #150228 45%, #05000d 100%);
+      border: 4px solid #f59e0b;
+      outline: 1.5px solid rgba(255, 215, 0, 0.5);
+      outline-offset: -16px;
+    }
+    .card-celestial-stars .card-badge-pill {
+      background: rgba(35, 6, 60, 0.9);
+      border-color: #ffd700;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.3);
+    }
+    .card-celestial-stars .card-script-eyebrow {
+      color: #ffccd5;
+      text-shadow: 0 0 15px rgba(255, 100, 140, 0.8);
+    }
+    .card-celestial-stars .card-names-title {
+      background: linear-gradient(180deg, #ffffff 0%, #fed7aa 35%, #fbbf24 70%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 25px rgba(251, 191, 36, 0.8));
+    }
+    .card-celestial-stars .qr-center-heart {
+      background: radial-gradient(circle at 35% 35%, #ffd700, #f59e0b 60%, #b45309 100%);
+      border-color: #ffffff;
+      color: #4a0410;
+    }
+  
+  </style>
+</head>
+<body>
+  <div class="card-standalone-root card-celestial-stars">
+    
+    <div class="card-gold-corners" style="filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7));">
+      <span class="corner-bottom-left" style="border-color: #fbbf24;"></span>
+      <span class="corner-bottom-right" style="border-color: #fbbf24;"></span>
+    </div>
+
+    <!-- Pill Badge -->
+    <div class="card-badge-pill">
+      <span>✨ 07 DE NOVIEMBRE · 3 AÑOS INOLVIDABLES ✨</span>
+    </div>
+
+    <!-- Header Typography -->
+    <div class="card-header-block">
+      <div class="card-script-eyebrow">Bajo las Estrellas</div>
+      <h1 class="card-names-title">Estrella &amp; Aron</h1>
+      <div class="card-intertwined-hearts">
+        <span class="card-divider-line" style="background: linear-gradient(90deg, transparent, #fbbf24, transparent);"></span>
+        <svg width="48" height="24" viewBox="0 0 48 24">
+          <path d="M12 6 C8 0, 0 3, 0 11 C0 17, 12 22, 12 22 C12 22, 24 17, 24 11 C24 3, 16 0, 12 6 Z" fill="none" stroke="#fbbf24" stroke-width="1.8" />
+          <path d="M26 6 C22 0, 14 3, 14 11 C14 17, 26 22, 26 22 C26 22, 38 17, 38 11 C38 3, 30 0, 26 6 Z" fill="none" stroke="#fed7aa" stroke-width="1.8" stroke-dasharray="3 1.5" />
+        </svg>
+        <span class="card-divider-line" style="background: linear-gradient(90deg, transparent, #fbbf24, transparent);"></span>
+      </div>
+    </div>
+
+    <!-- QR Code Centerpiece -->
+    <div class="qr-frame-wrapper" style="background: linear-gradient(135deg, #fed7aa, #fbbf24 50%, #b45309);">
+      <div class="qr-frame-inner">
+        <img src="data:image/png;base64,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" alt="Código QR Aniversario Estrella y Aron" class="qr-image" />
+        <div class="qr-center-heart">✦</div>
+      </div>
+    </div>
+
+    <!-- Instructions & Romance Message -->
+    <div class="card-instructions">
+      <div class="inst-quote">«Que nuestro amor brille más fuerte que cualquier estrella»</div>
+      <p class="inst-title">Escanea para encender los fuegos artificiales</p>
+      <p class="inst-hint">🎆 Toca el firmamento entero dedicado a ti, mi amor 🎆</p>
+    </div>
+
+    <!-- Footer Signoff -->
+    <div class="card-footer-signoff" style="border-top-color: rgba(251, 191, 36, 0.35); color: #fed7aa;">
+      <span>07 de Noviembre de 2023</span>
+      <span class="footer-sig">Para siempre juntos ♡</span>
+      <span>Amor Infinito</span>
+    </div>
+  
+  </div>
+</body>
+</html>

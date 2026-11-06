@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarjetas Románticas de Aniversario con Código QR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Great+Vibes&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0106;
+      font-family: 'Outfit', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+      padding: 40px 20px 80px 20px;
+      color: #fff;
+    }
+
+    .card-preview-header {
+      text-align: center;
+      max-width: 800px;
+    }
+    .card-preview-header h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.8rem;
+      background: linear-gradient(180deg, #ffffff, #ffd700 70%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .card-preview-header p {
+      color: #f5d77f;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Common Card Styles (Print & High-Res Snapshot Target: 900 x 1350 px -> Aspect Ratio 1:1.5) */
+    .anniversary-card {
+      width: 900px;
+      height: 1350px;
+      position: relative;
+      border-radius: 36px;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 40px rgba(212, 175, 55, 0.3);
+    }
+
+    /* =========================================================================
+       CARD 1: RUBY & GOLD ROMANCE (Luxury Night Edition)
+       ========================================================================= */
+    .card-ruby-gold {
+      background: radial-gradient(circle at 50% 12%, #4a0828 0%, #200411 50%, #0a0106 100%);
+      border: 4px solid #d4af37;
+      outline: 1.5px solid rgba(255, 215, 0, 0.4);
+      outline-offset: -16px;
+    }
+
+    .card-gold-corners {
+      position: absolute;
+      inset: 22px;
+      pointer-events: none;
+    }
+    .card-gold-corners::before, .card-gold-corners::after,
+    .corner-bottom-left, .corner-bottom-right {
+      content: "";
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 2px solid #ffd700;
+    }
+    .card-gold-corners::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .card-gold-corners::after { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .corner-bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+    .corner-bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+    .card-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 30px;
+      background: rgba(58, 6, 26, 0.9);
+      border: 1.8px solid #ffd700;
+      border-radius: 999px;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 12px rgba(255, 215, 0, 0.25);
+    }
+    .card-badge-pill span {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff9e6;
+      letter-spacing: 0.16em;
+    }
+
+    .card-header-block {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .card-script-eyebrow {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.8rem;
+      color: #f5d77f;
+      line-height: 1;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+    .card-names-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(180deg, #ffffff 0%, #fff4cc 30%, #ffd700 70%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 20px rgba(255, 215, 0, 0.7));
+      margin: 4px 0 10px 0;
+    }
+
+    .card-intertwined-hearts {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .card-divider-line {
+      width: 100px;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    }
+
+    /* QR Code Display Container */
+    .qr-frame-wrapper {
+      position: relative;
+      padding: 16px;
+      background: linear-gradient(135deg, #fff2cc 0%, #ffd700 50%, #b8860b 100%);
+      border-radius: 28px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.65);
+      margin: 15px 0;
+    }
+    .qr-frame-inner {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .qr-image {
+      width: 380px;
+      height: 380px;
+      display: block;
+      border-radius: 12px;
+    }
+    .qr-center-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle at 35% 35%, #ff4d6d, #b5173f 60%, #500718 100%);
+      border: 3px solid #ffd700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.8);
+      font-size: 1.8rem;
+      color: #ffffff;
+    }
+
+    .card-instructions {
+      text-align: center;
+      max-width: 680px;
+    }
+    .card-instructions .inst-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: #fff8e7;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    }
+    .card-instructions .inst-quote {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.1rem;
+      color: #ffd700;
+      line-height: 1.2;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+      margin-bottom: 6px;
+    }
+    .card-instructions .inst-hint {
+      font-size: 1.05rem;
+      color: #ffb3c6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .card-footer-signoff {
+      width: 100%;
+      border-top: 1px solid rgba(212, 175, 55, 0.35);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e5b366;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+    .card-footer-signoff .footer-sig {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.2rem;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    }
+
+    /* =========================================================================
+       CARD 2: VINTAGE LOVE PARCHMENT (Ivory & Gold Wax Seal Edition)
+       ========================================================================= */
+    .card-vintage-parchment {
+      background: radial-gradient(circle at 50% 20%, #fffdf8 0%, #fbf3e0 50%, #ebd4a8 100%);
+      border: 4px solid #b8860b;
+      outline: 2px dashed rgba(184, 134, 11, 0.45);
+      outline-offset: -16px;
+      color: #3b1b0b;
+    }
+    .card-vintage-parchment .card-gold-corners::before,
+    .card-vintage-parchment .card-gold-corners::after,
+    .card-vintage-parchment .corner-bottom-left,
+    .card-vintage-parchment .corner-bottom-right {
+      border-color: #b8860b;
+    }
+    .card-vintage-parchment .card-badge-pill {
+      background: #460515;
+      border-color: #ffd700;
+    }
+    .card-vintage-parchment .card-script-eyebrow {
+      color: #80102a;
+      text-shadow: none;
+    }
+    .card-vintage-parchment .card-names-title {
+      background: linear-gradient(180deg, #500718 0%, #750e27 40%, #29030c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 6px rgba(120, 15, 40, 0.25));
+    }
+    .card-vintage-parchment .card-divider-line {
+      background: linear-gradient(90deg, transparent, #80102a, transparent);
+    }
+    .card-vintage-parchment .card-instructions .inst-title {
+      color: #380814;
+      text-shadow: none;
+    }
+    .card-vintage-parchment .card-instructions .inst-quote {
+      color: #9f0e2f;
+      text-shadow: none;
+    }
+    .card-vintage-parchment .card-instructions .inst-hint {
+      color: #590d22;
+    }
+    .card-vintage-parchment .card-footer-signoff {
+      border-top-color: rgba(184, 134, 11, 0.4);
+      color: #633210;
+    }
+    .card-vintage-parchment .card-footer-signoff .footer-sig {
+      color: #500718;
+      text-shadow: none;
+    }
+
+    /* =========================================================================
+       CARD 3: CELESTIAL STARRY FIREWORKS (Galactic Romance Edition)
+       ========================================================================= */
+    .card-celestial-stars {
+      background: radial-gradient(circle at 50% 15%, #2a0845 0%, #150228 45%, #05000d 100%);
+      border: 4px solid #f59e0b;
+      outline: 1.5px solid rgba(255, 215, 0, 0.5);
+      outline-offset: -16px;
+    }
+    .card-celestial-stars .card-badge-pill {
+      background: rgba(35, 6, 60, 0.9);
+      border-color: #ffd700;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.3);
+    }
+    .card-celestial-stars .card-script-eyebrow {
+      color: #ffccd5;
+      text-shadow: 0 0 15px rgba(255, 100, 140, 0.8);
+    }
+    .card-celestial-stars .card-names-title {
+      background: linear-gradient(180deg, #ffffff 0%, #fed7aa 35%, #fbbf24 70%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 25px rgba(251, 191, 36, 0.8));
+    }
+    .card-celestial-stars .qr-center-heart {
+      background: radial-gradient(circle at 35% 35%, #ffd700, #f59e0b 60%, #b45309 100%);
+      border-color: #ffffff;
+      color: #4a0410;
+    }
+
+    .btn-download-bar {
+      display: flex;
+      gap: 16px;
+      margin-top: 15px;
+    }
+    .btn-card-action {
+      background: linear-gradient(135deg, #e11d48, #9f0e2f);
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 2px solid #ffd700;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-card-action:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 215, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-preview-header">
+    <h1>Tarjetas Románticas de Aniversario</h1>
+    <p>3 Diseños Exclusivos de Alta Definición con Código QR Escaneable para Estrella &amp; Aron</p>
+  </div>
+
+  <!-- ==================== DISEÑO 1 ==================== -->
+  <div class="card-container-wrapper">
+    <div class="anniversary-card card-ruby-gold" id="card-design-1">
+      <div class="card-gold-corners">
+        <span class="corner-bottom-left"></span>
+        <span class="corner-bottom-right"></span>
+      </div>
+
+      <!-- Pill Badge -->
+      <div class="card-badge-pill">
+        <span>❤ 07 DE NOVIEMBRE · 3 AÑOS JUNTOS ❤</span>
+      </div>
+
+      <!-- Header Typography -->
+      <div class="card-header-block">
+        <div class="card-script-eyebrow">Nuestro Aniversario</div>
+        <h2 class="card-names-title">Estrella &amp; Aron</h2>
+        <div class="card-intertwined-hearts">
+          <span class="card-divider-line"></span>
+          <svg width="48" height="24" viewBox="0 0 48 24">
+            <path d="M12 6 C8 0, 0 3, 0 11 C0 17, 12 22, 12 22 C12 22, 24 17, 24 11 C24 3, 16 0, 12 6 Z" fill="none" stroke="#ffd700" stroke-width="1.8" />
+            <path d="M26 6 C22 0, 14 3, 14 11 C14 17, 26 22, 26 22 C26 22, 38 17, 38 11 C38 3, 30 0, 26 6 Z" fill="none" stroke="#fff8db" stroke-width="1.8" stroke-dasharray="3 1.5" />
+          </svg>
+          <span class="card-divider-line"></span>
+        </div>
+      </div>
+
+      <!-- QR Code Centerpiece -->
+      <div class="qr-frame-wrapper">
+        <div class="qr-frame-inner">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAYAAAC+ZpjcAAAAAklEQVR4AewaftIAABWSSURBVO3BwZFguXItyMOwggaQA/rLATmgARYcbmn9F1OwsPs6k+7+X//9PwIAQJsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACt/uTRGjP85+178mKNmS/te/JijZkv7XvyYo2ZF/uevFhj5jfb9+Qra8z8BPuevFhjhn/a9+QnWGOG/7x9T/5WBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVn/ysX1P+Kc1Zn6zNWZ+gjVmfrN9T760xsyLNWa+su/JizVmfoJ9T760xsyX9j15scbMl/Y9+dK+J/zTGjNfqQAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0OpPfog1Zn6CfU/4p31PXqwx82Lfk59gjRn+ad+Tr6wx82LfkxdrzHxpjZnfbI2ZF/ue8E9rzPwE+57821UAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGj1J/yftO/JT7DvyYs1Zr6078mX9j35CfY9ebHGzN/a9+RLa8y82PfkS/uefGmNmRf7nnxpjZkX+57A/x8VAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABa/Qn8hTVmvrTvCf+0xsxPsO/JV9aYebHvyZfWmPkJ9j35CdaY+dIaMy/2PeH/lgoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK3+5IfY94Q+a8y82PeE/3v2PfnSvid/a42ZL60x82LfkxdrzLzY9+TFGjNfWmPmS/ue8E/7ntCjAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqz/52Boz/N+zxsyLfU++tO/JizVmXux78mKNmRf7nrxYY+bFvicv1pj5W/uevFhj5sW+Jy/WmHmx78mLNWZe7HvyYo2ZF/uevFhj5ktrzLzY9+RLa8zwn1UBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKDVnzza9wR+mzVmvrTGzJfWmHmx78mLNWZe7HvyW+178qV9T16sMfNi35Mv7XvyYo2Zn2DfE36mCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArf7kh1hj5ifY9+TFGjMv9j35CfY9+Qn2PXmxxsyLfU++tMYM/9u+J19aY+ZL+5682PfkxRozX9r35MW+Jy/WmHmxxsxPsO/Jl9aY+Qn2PflbFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWv3JozVmXux78hPse/JijZkX+578ZmvM/Gb7nrxYY+bFvicv9j350r4nX1lj5sW+Jy/WmKHPvicv1pihzxozL/Y9+dK+J/92FQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWv3Jo31P+Kd9T16sMfOlfU++tO/JizVmvrTGzIt9T17se/ITrDHzYt+TF2vM/K19T16sMcM/rTHzm+178mKNmRf7nrxYY+Y32/fkt6oAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANDqTx6tMfOlfU++tMbMi31PXux78mKNmRdrzLzY9+TFGjP8560x82LfkxdrzPxW+578BGvMvNj35MUaM1/a9+TFGjNfWmPmS/uefGmNmRf7nvxWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWv3Jo31PXqwx82KNmRf7nrzY9+RLa8y82PfkN9v35DdbY+bFvicv9j35CfY9oce+J1/a9+TFGjMv9j35CfY9ebHGzG+2xsyLfU/+7SoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALT6k0drzPxma8y82Pfkxb4nL9aY+dK+J7/ZGjNf2vfkS2vMvNj35MW+Jy/WmPlb+578BGvMfGnfkxdrzHxp35MXa8y82PfkS2vMvNj35MUaMz/BvidfWmPmxb4nf6sCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrP/kh9j350r4nX1pj5sW+Jy/WmHmxxsyX1pj5zdaY+dK+Jy/WmPm3W2PmJ9j35EtrzLzY9+RLa8z8BGvM8HPte/KVCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArf7rv/9HPrTGzIt9T760xsyLfU++tMbMi31PvrTGzIt9T36CNWa+tO/JT7DGzIt9T/7WGjMv9j15scbMi31PXqwx82Lfky+tMfOlfU9+szVmXux78mKNmS/te/JijZkX+558pQIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKs/+di+Jy/WmHmx78lPsMbMi31PvrTGzIt9T/jPW2PmS/ue/NutMfOlNWZe7HvCP60x82LfkxdrzHxp35MXa8y82PfkxRozL9aY+dIaMy/2PflbFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWv3JozVmXux78mLfkxdrzHxpjZkX+578ZmvM/AT7ntBnjZkX+578rX1PXqwx85utMfOlfU9+s31PvrTGzJfWmPnSvicv1pj5t6sAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANDqTx7te/Kb7XvypTVmXux78qV9T16sMfOlfU9erDHzYt+TF2vMvFhj5kv7nrxYY+Yra8x8ad+Tn2Dfky+tMfNi35MXa8z8BPuefGnfkxdrzPwE+57821UAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGj1Jz/EGjMv9j15scbMl/Y9ebHGzJf2PXmx78mLNWa+tO/JizVmXux78mKNmRf7nnxp35N/u31PvrTGzJf2PXmxxsxPsO/JizVmvrTGzIt9T/inNWa+tO/J36oAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANDqv/77f+TBGjO/2b4nL9aY+Qn2PXmxxsyLfU++tMbMl/Y9ebHGzG+278m/3RozL/Y9ebHGzIt9T16sMfNi35OfYI2Z32zfkxdrzHxp35MXa8y82PfkxRozL/Y9+VsVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFZ/8rF9T760xsyLNWZe7HvypTVmXqwx82LfkxdrzLzY94Q++558aY2ZF/ue/K01Zl7se/Kb7XvypTVmvrTvyYs1Zl7se/KlNWZe7HvyYo2Zn2CNmX+7CgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArf7kh1hj5idYY+ZL+578BPuefGnfk99s35MvrTHzYt+Tf7s1Zn6zNWZ+gn1PXqwx82Lfk99sjZmfYN+T36oCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrP/nYGjNf2vfkxRozL/Y9+dIaMy/2PXmxxsxPsO/Jl9aYebHvyYs1Zl7se/KlNWZe7HvyW+178mKNmS/te/JijZmfYI2ZL+178qV9T16sMfObrTHzYt+Tv1UBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKDVn3xs35MXa8z8BGvM/ARrzLzY9+QnWGPmJ1hj5sW+Jz/Bvicv1pj5W/uevFhj5ktrzLzY9+RLa8y82PfkxRozL/Y9+QnWmHmx78mX9j35CdaYebHvyVcqAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0+pOPrTHzYt+TF2vMvNj35DdbY+ZLa8x8ad+TF2vMvNj35EtrzNBj35MXa8y82PfkJ9j35MUaM19aY+ZL+558aY2Z32zfk9+qAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqz95tO/Jl9aYebHvyYs1Zl7se/JijZkX+5682PfkxRozX9r35MUaMy/2PXmxxsxPsO/Jl9aYebHvyd9aY4Z/WmPmS/uefGmNmRf7nrxYY+ZL+57QZ42ZF/ue/K0KAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACt/uu//0f4hzVmXux78qU1Zl7se8I/rTHzYt+TF2vM/Gb7nvxWa8y82PfkxRozL/Y9ebHGzJf2PfnSGjNf2vfkS2vMvNj35MUaMy/2PXmxxsyX9j35WxUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFr9yaM1Zl7se/KbrTHzm60x82Lfky+tMfOlNWZe7HvyYo2ZL+178mKNmRf7nvzb7XtCnzVmfoJ9T16sMfNi35MX+578BGvMvNj35N+uAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqz/5IdaYebHvyU+w78mLNWZerDHzYt8T+qwx82LfkxdrzLxYY+bfbo2Zn2Dfky+tMfOlfU++tMbMi31PXqwx82Lfky+tMfMT7HvyYo2ZL+178rcqAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0+pMfYt+TL+178mKNmRdrzPxma8x8ad8T/vP2PXmxxszf2vfkJ1hj5sW+Jy/WmPnSGjNf2vfkxRozL/Y9ebHGzJf2PfnSGjNf2vfk364CAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrP/kh1ph5se/JT7DvyYs1Zl7se/JijZkX+558aY2Zn2DfkxdrzLzY9+RLa8zwv+178pvte/KlNWa+tMbMb7bGzE+wxsyLfU++UgEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoNWf8P+0xsyX1pj50hozL/Y9ebHGzG+278mX9j350hozX9r35G+tMfNi35MXa8y82PfkxRozL/Y9ebHGDD/XGjM/wRozL/Y9+berAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQ6r/++3+E/3PWmPnSvidfWmPmN9v35MUaM1/a9+Qra8y82PfkxRozL/Y9+c3WmPkJ9j15scbMi31PfoI1Zl7se/KlNWa+tO/J36oAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANDqTx6tMcN/3r4nL/Y94edaY+ZL+568WGPmK/uevFhj5sW+Jz/BGjNf2vfkxRozL/Y9ebHGzE+wxsyLfU9+gjVmXux78m9XAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCg1Z98bN8T/mmNmZ9gjZkv7XvyE+x78mKNmRf7nrxYY+ZL+568WGPmK/uefGmNmZ9g35MXa8x8aY2Z32zfk99s35MvrTHzYt+Tv1UBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKDVn/wQa8z8BPue/ARrzHxp35MXa8y82PfkxRozX9r35Ev7nnxpjZkX+578rTVmXux78qV9T16sMfNi35MXa8y82PfkN1tj5sUaM/zTGjMv9j15se/JVyoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALT6E/gL+578ZvuevFhj5sW+J19aY+bFvicv9j35t1tj5sW+Jy/WmHmx78mLNWZe7HvyYo2ZF/uevFhj5sW+Jy/2PXmxxsyLfU9erDHzYt+TF2vMfGmNmS/te/K3KgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtPoT+AtrzHxp35MXa8y82PfkS2vMvNj35MW+Jy/WmPnSvid/a9+TF2vMvFhj5ktrzLzY9+TFGjMv9j2hzxozX1pj5sW+Jy/WmPnSvidfqQAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0OpPfoh9T+iz78mLNWZ+gn1PXqwx82LfkxdrzPwE+578VvuevFhj5kv7nnxp35MXa8y82Pfkxb4nL9aY+dK+Jz/BGjMv1pjhf6sAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALSqAADQqgIAQKsKAACtKgAAtKoAANDqTz62xgz/9+x78qU1Zl7se/JijZkvrTHzYt+T32qNmRf7nrzY9+TFGjO/2b4nL9aYebHvyYt9T760xsxvtu8J/1sFAIBWFQAAWlUAAGhVAQCgVQUAgFYVAABaVQAAaFUBAKBVBQCAVhUAAFpVAABoVQEAoFUFAIBW//Xf/yMAALSpAADQqgIAQKsKAACtKgAAtKoAANCqAgBAqwoAAK0qAAC0qgAA0KoCAECrCgAArSoAALT6/wDosPupwhA2OAAAAABJRU5ErkJggg==" alt="Código QR Aniversario Estrella y Aron" class="qr-image" id="qr-img-1" />
+          <div class="qr-center-heart">❤</div>
+        </div>
+      </div>
+
+      <!-- Instructions & Romance Message -->
+      <div class="card-instructions">
+        <div class="inst-quote">«Cada segundo a tu lado es mi lugar favorito»</div>
+        <p class="inst-title">Escanea con la cámara de tu celular</p>
+        <p class="inst-hint">✨ Abre tu cámara o app de QR para ver nuestra sorpresa de amor ✨</p>
+      </div>
+
+      <!-- Footer Signoff -->
+      <div class="card-footer-signoff">
+        <span>07 de Noviembre de 2023</span>
+        <span class="footer-sig">Con todo mi amor, Aron ♡</span>
+        <span>Amor Infinito</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DISEÑO 2 ==================== -->
+  <div class="card-container-wrapper">
+    <div class="anniversary-card card-vintage-parchment" id="card-design-2">
+      <div class="card-gold-corners">
+        <span class="corner-bottom-left"></span>
+        <span class="corner-bottom-right"></span>
+      </div>
+
+      <!-- Pill Badge -->
+      <div class="card-badge-pill">
+        <span style="color: #ffd700;">♡ PARA: MI NIÑA ESTRELLA ♡</span>
+      </div>
+
+      <!-- Header Typography -->
+      <div class="card-header-block">
+        <div class="card-script-eyebrow">Carta de Nuestro Amor</div>
+        <h2 class="card-names-title">Estrella &amp; Aron</h2>
+        <div class="card-intertwined-hearts">
+          <span class="card-divider-line"></span>
+          <svg width="48" height="24" viewBox="0 0 48 24">
+            <path d="M12 6 C8 0, 0 3, 0 11 C0 17, 12 22, 12 22 C12 22, 24 17, 24 11 C24 3, 16 0, 12 6 Z" fill="none" stroke="#80102a" stroke-width="1.8" />
+            <path d="M26 6 C22 0, 14 3, 14 11 C14 17, 26 22, 26 22 C26 22, 38 17, 38 11 C38 3, 30 0, 26 6 Z" fill="none" stroke="#b8860b" stroke-width="1.8" stroke-dasharray="3 1.5" />
+          </svg>
+          <span class="card-divider-line"></span>
+        </div>
+      </div>
+
+      <!-- QR Code Centerpiece -->
+      <div class="qr-frame-wrapper" style="background: linear-gradient(135deg, #d4af37, #8a6d1c);">
+        <div class="qr-frame-inner" style="background: #fffef9;">
+          <img src="data:image/png;base64,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" alt="Código QR Aniversario Estrella y Aron" class="qr-image" id="qr-img-2" />
+          <div class="qr-center-heart" style="background: radial-gradient(circle at 35% 35%, #80102a, #4a0718); border-color: #ffd700;">♡</div>
+        </div>
+      </div>
+
+      <!-- Instructions & Romance Message -->
+      <div class="card-instructions">
+        <div class="inst-quote">«Gracias por caminar a mi lado estos 3 años inolvidables»</div>
+        <p class="inst-title">Apunta tu celular aquí para abrir la carta</p>
+        <p class="inst-hint">📜 Te espera nuestra historia, música y fuegos artificiales 📜</p>
+      </div>
+
+      <!-- Footer Signoff -->
+      <div class="card-footer-signoff">
+        <span>3 Años Juntos</span>
+        <span class="footer-sig">Tu amor, Aron ♡</span>
+        <span>07 • Noviembre</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DISEÑO 3 ==================== -->
+  <div class="card-container-wrapper">
+    <div class="anniversary-card card-celestial-stars" id="card-design-3">
+      <div class="card-gold-corners">
+        <span class="corner-bottom-left"></span>
+        <span class="corner-bottom-right"></span>
+      </div>
+
+      <!-- Pill Badge -->
+      <div class="card-badge-pill">
+        <span>✨ 07 DE NOVIEMBRE · 3 AÑOS INOLVIDABLES ✨</span>
+      </div>
+
+      <!-- Header Typography -->
+      <div class="card-header-block">
+        <div class="card-script-eyebrow">Bajo las Estrellas</div>
+        <h2 class="card-names-title">Estrella &amp; Aron</h2>
+        <div class="card-intertwined-hearts">
+          <span class="card-divider-line" style="background: linear-gradient(90deg, transparent, #fbbf24, transparent);"></span>
+          <svg width="48" height="24" viewBox="0 0 48 24">
+            <path d="M12 6 C8 0, 0 3, 0 11 C0 17, 12 22, 12 22 C12 22, 24 17, 24 11 C24 3, 16 0, 12 6 Z" fill="none" stroke="#fbbf24" stroke-width="1.8" />
+            <path d="M26 6 C22 0, 14 3, 14 11 C14 17, 26 22, 26 22 C26 22, 38 17, 38 11 C38 3, 30 0, 26 6 Z" fill="none" stroke="#fed7aa" stroke-width="1.8" stroke-dasharray="3 1.5" />
+          </svg>
+          <span class="card-divider-line" style="background: linear-gradient(90deg, transparent, #fbbf24, transparent);"></span>
+        </div>
+      </div>
+
+      <!-- QR Code Centerpiece -->
+      <div class="qr-frame-wrapper" style="background: linear-gradient(135deg, #fed7aa, #fbbf24 50%, #b45309);">
+        <div class="qr-frame-inner">
+          <img src="data:image/png;base64,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" alt="Código QR Aniversario Estrella y Aron" class="qr-image" id="qr-img-3" />
+          <div class="qr-center-heart">✦</div>
+        </div>
+      </div>
+
+      <!-- Instructions & Romance Message -->
+      <div class="card-instructions">
+        <div class="inst-quote">«Que nuestro amor brille más fuerte que cualquier estrella»</div>
+        <p class="inst-title">Escanea para encender los fuegos artificiales</p>
+        <p class="inst-hint">🎆 Toca el firmamento entero dedicado a ti, mi amor 🎆</p>
+      </div>
+
+      <!-- Footer Signoff -->
+      <div class="card-footer-signoff" style="border-top-color: rgba(251, 191, 36, 0.35); color: #fed7aa;">
+        <span>07 de Noviembre de 2023</span>
+        <span class="footer-sig">Para siempre juntos ♡</span>
+        <span>Amor Infinito</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarjeta 1 - Ruby & Gold Romance</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Great+Vibes&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 900px;
+      height: 1350px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card-standalone-root {
+      width: 900px;
+      height: 1350px;
+      position: relative;
+      border-radius: 36px;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 40px rgba(212, 175, 55, 0.3);
+    }
+
+    .card-gold-corners {
+      position: absolute;
+      inset: 22px;
+      pointer-events: none;
+    }
+    .card-gold-corners::before, .card-gold-corners::after,
+    .corner-bottom-left, .corner-bottom-right {
+      content: "";
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 2px solid #ffd700;
+    }
+    .card-gold-corners::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .card-gold-corners::after { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .corner-bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+    .corner-bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+    .card-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 30px;
+      background: rgba(58, 6, 26, 0.9);
+      border: 1.8px solid #ffd700;
+      border-radius: 999px;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 12px rgba(255, 215, 0, 0.25);
+    }
+    .card-badge-pill span {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff9e6;
+      letter-spacing: 0.16em;
+    }
+
+    .card-header-block {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .card-script-eyebrow {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.8rem;
+      color: #f5d77f;
+      line-height: 1;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+    .card-names-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(180deg, #ffffff 0%, #fff4cc 30%, #ffd700 70%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 20px rgba(255, 215, 0, 0.7));
+      margin: 4px 0 10px 0;
+    }
+
+    .card-intertwined-hearts {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .card-divider-line {
+      width: 100px;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    }
+
+    /* QR Code Display Container */
+    .qr-frame-wrapper {
+      position: relative;
+      padding: 16px;
+      background: linear-gradient(135deg, #fff2cc 0%, #ffd700 50%, #b8860b 100%);
+      border-radius: 28px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.65);
+      margin: 15px 0;
+    }
+    .qr-frame-inner {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .qr-image {
+      width: 380px;
+      height: 380px;
+      display: block;
+      border-radius: 12px;
+    }
+    .qr-center-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle at 35% 35%, #ff4d6d, #b5173f 60%, #500718 100%);
+      border: 3px solid #ffd700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.8);
+      font-size: 1.8rem;
+      color: #ffffff;
+    }
+
+    .card-instructions {
+      text-align: center;
+      max-width: 680px;
+    }
+    .card-instructions .inst-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: #fff8e7;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    }
+    .card-instructions .inst-quote {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.1rem;
+      color: #ffd700;
+      line-height: 1.2;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+      margin-bottom: 6px;
+    }
+    .card-instructions .inst-hint {
+      font-size: 1.05rem;
+      color: #ffb3c6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .card-footer-signoff {
+      width: 100%;
+      border-top: 1px solid rgba(212, 175, 55, 0.35);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e5b366;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+    .card-footer-signoff .footer-sig {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.2rem;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    }
+
+    
+    .card-ruby-gold {
+      background: radial-gradient(circle at 50% 12%, #4a0828 0%, #200411 50%, #0a0106 100%);
+      border: 4px solid #d4af37;
+      outline: 1.5px solid rgba(255, 215, 0, 0.4);
+      outline-offset: -16px;
+    }
+  
+  </style>
+</head>
+<body>
+  <div class="card-standalone-root card-ruby-gold">
+    
+    <div class="card-gold-corners">
+      <span class="corner-bottom-left"></span>
+      <span class="corner-bottom-right"></span>
+    </div>
+
+    <!-- Pill Badge -->
+    <div class="card-badge-pill">
+      <span>❤ 07 DE NOVIEMBRE · 3 AÑOS JUNTOS ❤</span>
+    </div>
+
+    <!-- Header Typography -->
+    <div class="card-header-block">
+      <div class="card-script-eyebrow">Nuestro Aniversario</div>
+      <h1 class="card-names-title">Estrella &amp; Aron</h1>
+      <div class="card-intertwined-hearts">
+        <span class="card-divider-line"></span>
+        <svg width="48" height="24" viewBox="0 0 48 24">
+          <path d="M12 6 C8 0, 0 3, 0 11 C0 17, 12 22, 12 22 C12 22, 24 17, 24 11 C24 3, 16 0, 12 6 Z" fill="none" stroke="#ffd700" stroke-width="1.8" />
+          <path d="M26 6 C22 0, 14 3, 14 11 C14 17, 26 22, 26 22 C26 22, 38 17, 38 11 C38 3, 30 0, 26 6 Z" fill="none" stroke="#fff8db" stroke-width="1.8" stroke-dasharray="3 1.5" />
+        </svg>
+        <span class="card-divider-line"></span>
+      </div>
+    </div>
+
+    <!-- QR Code Centerpiece -->
+    <div class="qr-frame-wrapper">
+      <div class="qr-frame-inner">
+        <img src="data:image/png;base64,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" alt="Código QR Aniversario Estrella y Aron" class="qr-image" />
+        <div class="qr-center-heart">❤</div>
+      </div>
+    </div>
+
+    <!-- Instructions & Romance Message -->
+    <div class="card-instructions">
+      <div class="inst-quote">«Cada segundo a tu lado es mi lugar favorito»</div>
+      <p class="inst-title">Escanea con la cámara de tu celular</p>
+      <p class="inst-hint">✨ Abre tu cámara o app de QR para ver nuestra sorpresa de amor ✨</p>
+    </div>
+
+    <!-- Footer Signoff -->
+    <div class="card-footer-signoff">
+      <span>07 de Noviembre de 2023</span>
+      <span class="footer-sig">Con todo mi amor, Aron ♡</span>
+      <span>Amor Infinito</span>
+    </div>
+  
+  </div>
+</body>
+</html>
