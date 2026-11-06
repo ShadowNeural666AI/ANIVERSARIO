@@ -1,0 +1,564 @@
+* {
+  position: relative;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  background-color: #000;
+}
+
+body {
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: "Russo One", arial, sans-serif;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+}
+
+.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.remove {
+  display: none !important;
+}
+
+.blur {
+  filter: blur(12px);
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-init {
+  width: 100%;
+  align-self: center;
+  text-align: center;
+  text-transform: uppercase;
+}
+.loading-init__header {
+  font-size: 2.2em;
+}
+.loading-init__status {
+  margin-top: 1em;
+  font-size: 0.8em;
+  opacity: 0.75;
+}
+
+.stage-container {
+  overflow: hidden;
+  box-sizing: initial;
+  border: 1px solid #222;
+  margin: -1px;
+}
+@media (max-width: 840px) {
+  .stage-container {
+    border: none;
+    margin: 0;
+  }
+}
+
+.canvas-container {
+  width: 100%;
+  height: 100%;
+  transition: filter 0.3s;
+}
+.canvas-container canvas {
+  position: absolute;
+  mix-blend-mode: lighten;
+  transform: translateZ(0);
+}
+
+.controls {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  width: auto;
+  display: flex;
+  gap: 12px;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+  z-index: 50;
+}
+
+.controls:hover {
+  opacity: 0.95;
+}
+
+.menu {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.42);
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.menu__inner-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: opacity 0.3s;
+}
+.menu__header {
+  margin-top: auto;
+  margin-bottom: 8px;
+  padding-top: 16px;
+  font-size: 2em;
+  text-transform: uppercase;
+}
+.menu__subheader {
+  margin-bottom: auto;
+  padding-bottom: 12px;
+  font-size: 0.86em;
+  opacity: 0.8;
+}
+.menu form {
+  width: 100%;
+  max-width: 400px;
+  padding: 0 10px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.menu .form-option {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  transition: opacity 0.3s;
+}
+.menu .form-option label {
+  display: block;
+  width: 50%;
+  padding-right: 12px;
+  text-align: right;
+  text-transform: uppercase;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.menu .form-option--select select {
+  display: block;
+  width: 50%;
+  height: 30px;
+  font-size: 1rem;
+  font-family: "Russo One", arial, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.menu .form-option--select select option {
+  background-color: black;
+}
+.menu .form-option--checkbox input {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  opacity: 0.5;
+}
+@media (max-width: 840px) {
+  .menu .form-option select, .menu .form-option input {
+    outline: none;
+  }
+}
+
+.close-menu-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.btn {
+  opacity: 0.16;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  cursor: default;
+  transition: opacity 0.3s;
+}
+.btn--bright {
+  opacity: 0.5;
+}
+@media (min-width: 840px) {
+  .btn:hover {
+    opacity: 0.32;
+  }
+  .btn--bright:hover {
+    opacity: 0.75;
+  }
+}
+.btn svg {
+  display: block;
+  margin: auto;
+}
+
+.help-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  transition-property: visibility;
+  transition-duration: 0.25s;
+}
+.help-modal__overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: 0.25s;
+}
+.help-modal__dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  max-height: calc(100vh - 100px);
+  margin: 10px;
+  padding: 20px;
+  border-radius: 0.3em;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: scale(0.9, 0.9);
+  transition-property: opacity, transform;
+  transition-timing-function: ease-in;
+  transition-duration: 0.25s;
+}
+@media (min-width: 840px) {
+  .help-modal__dialog {
+    font-size: 1.25rem;
+    max-width: 500px;
+  }
+}
+.help-modal__header {
+  font-size: 1.75em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.help-modal__body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1em 0;
+  padding: 1em 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+}
+.help-modal__close-btn {
+  flex-shrink: 0;
+  outline: none;
+  border: none;
+  border-radius: 2px;
+  padding: 0.25em 0.75em;
+  margin-top: 0.36em;
+  font-family: "Russo One", arial, sans-serif;
+  font-size: 1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-color: rgba(255, 255, 255, 0.25);
+  transition: color 0.3s, background-color 0.3s;
+}
+.help-modal__close-btn:hover, .help-modal__close-btn:active, .help-modal__close-btn:focus {
+  color: #FFF;
+  background-color: #09F;
+}
+.help-modal.active {
+  visibility: visible;
+  transition-duration: 0.4s;
+}
+.help-modal.active .help-modal__overlay {
+  opacity: 1;
+  transition-timing-function: ease-out;
+  transition-duration: 0.4s;
+}
+.help-modal.active .help-modal__dialog {
+  opacity: 1;
+  transform: scale(1, 1);
+  transition-timing-function: ease-out;
+  transition-duration: 0.4s;
+}
+
+/* ==========================================================================
+   ROMANTIC ANNIVERSARY CELEBRATION OVERLAY (ESTRELLA & ARON)
+   ========================================================================== */
+.anniversary-fireworks-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%);
+  width: 92%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: fw-overlay-fadein 1.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes fw-overlay-fadein {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -52%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1);
+  }
+}
+
+/* Top Ornate Pill Badge */
+.fw-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 26px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(55, 6, 22, 0.85) 0%, rgba(20, 2, 8, 0.92) 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.85);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.45), inset 0 0 12px rgba(255, 215, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.85);
+  margin-bottom: 12px;
+}
+
+.fw-pill-heart {
+  color: #ff3366;
+  font-size: 0.95rem;
+  text-shadow: 0 0 8px rgba(255, 51, 102, 0.8);
+  animation: fw-heart-beat 2s infinite ease-in-out;
+}
+
+.fw-pill-icon {
+  font-size: 0.95rem;
+}
+
+.fw-pill-text {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.75rem, 1.6vw, 0.92rem);
+  font-weight: 700;
+  color: #fff9e6;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Intertwined Golden Hearts */
+.fw-intertwined-hearts {
+  width: 65px;
+  height: 32px;
+  margin-bottom: -4px;
+}
+
+.svg-fw-double-heart {
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: fw-hearts-pulse 2.8s infinite ease-in-out;
+}
+
+@keyframes fw-hearts-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.95));
+  }
+}
+
+/* Grand Couple Names */
+.fw-couple-title-wrap {
+  width: 100%;
+  position: relative;
+}
+
+.fw-couple-names {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(3.8rem, 9.5vw, 7rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #fff4cc 25%, #ffd700 55%, #f59e0b 85%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.85))
+          drop-shadow(0 0 35px rgba(245, 158, 11, 0.65))
+          drop-shadow(0 0 65px rgba(220, 38, 38, 0.45));
+  letter-spacing: 0.02em;
+}
+
+/* Dedication Subtitle */
+.fw-dedication-subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.15rem, 2.7vw, 1.95rem);
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  margin: 6px 0 18px 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 20px rgba(255, 215, 0, 0.35);
+}
+
+.fw-script-italic-gold {
+  font-family: 'Great Vibes', cursive;
+  font-style: italic;
+  font-size: 1.4em;
+  font-weight: 400;
+  color: #ffd700;
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.9);
+  padding: 0 4px;
+}
+
+.fw-red-neon-heart {
+  color: #ff1a4b;
+  font-size: 1.25em;
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 10px rgba(255, 26, 75, 0.95)) drop-shadow(0 0 22px rgba(255, 26, 75, 0.6));
+  animation: fw-heart-beat 1.8s infinite ease-in-out;
+}
+
+@keyframes fw-heart-beat {
+  0%, 100% { transform: scale(1); }
+  15%      { transform: scale(1.18); }
+  30%      { transform: scale(1); }
+  45%      { transform: scale(1.12); }
+}
+
+/* Tap / Click Hint */
+.fw-interaction-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.fw-hint-filigree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.fw-hint-line {
+  height: 1px;
+  width: clamp(50px, 15vw, 120px);
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+  opacity: 0.8;
+}
+
+.fw-hint-accent-heart {
+  color: #ffd700;
+  font-size: 0.9rem;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
+.fw-hint-text {
+  font-family: 'Quicksand', sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  font-weight: 600;
+  color: #ffe6b3;
+  letter-spacing: 0.05em;
+  opacity: 0.92;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 215, 0, 0.3);
+  margin: 2px 0 0 0;
+}
+
+.fw-hint-bottom-heart {
+  color: #ffd700;
+  font-size: 1.05rem;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.85);
+  animation: fw-heart-beat 2.4s infinite ease-in-out;
+  margin-top: 4px;
+}
+
+/* Celestial Glowing Red & Gold Horizon Clouds */
+.fw-celestial-clouds-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.clouds-glow-radiance {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 160px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(180, 20, 50, 0.45) 0%, rgba(220, 50, 30, 0.25) 45%, transparent 75%);
+  filter: blur(25px);
+  pointer-events: none;
+}
+
+.svg-celestial-clouds {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .anniversary-fireworks-overlay {
+    width: 95%;
+    transform: translate(-50%, -56%);
+  }
+
+  .fw-badge-pill {
+    padding: 6px 18px;
+    gap: 8px;
+  }
+
+  .fw-intertwined-hearts {
+    width: 50px;
+    height: 26px;
+  }
+
+  .fw-celestial-clouds-floor {
+    height: 160px;
+  }
+}
