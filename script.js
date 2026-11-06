@@ -1022,24 +1022,83 @@ document.addEventListener('DOMContentLoaded', () => {
      10. 3D ROMANTIC LOVE ENVELOPE CONTROLLER (EFECTO CARTA ADAPTADO)
      ========================================================================== */
   const envelope = document.getElementById('romantic-envelope');
+  const closeLetterBtn = document.getElementById('close-letter-btn');
+  const closeLetterBtnSecondary = document.getElementById('close-letter-btn-secondary');
+
+  function openLetter() {
+    if (!envelope) return;
+    envelope.classList.add('is-open');
+    envelope.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeLetter() {
+    if (!envelope) return;
+    envelope.classList.remove('is-open');
+    envelope.setAttribute('aria-expanded', 'false');
+  }
+
   if (envelope) {
     envelope.addEventListener('click', (e) => {
-      // Don't toggle closed if user clicked the celebrate button inside the letter
-      if (e.target.closest('#open-fireworks-btn')) return;
+      // If user clicked any close button inside the letter
+      if (e.target.closest('#close-letter-btn') || e.target.closest('#close-letter-btn-secondary')) {
+        e.stopPropagation();
+        closeLetter();
+        return;
+      }
 
-      const isOpening = !envelope.classList.contains('is-open');
-      envelope.classList.toggle('is-open');
-      envelope.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+      // If user clicked the celebrate fireworks button
+      if (e.target.closest('#open-fireworks-btn')) {
+        return;
+      }
+
+      // If user clicked or scrolled inside the letter text, keep it open (do not toggle!)
+      if (e.target.closest('.letter')) {
+        return;
+      }
+
+      // Toggle opening/closing when tapping on the envelope flap/body/seal
+      if (envelope.classList.contains('is-open')) {
+        closeLetter();
+      } else {
+        openLetter();
+      }
     });
 
-    // Keyboard accessibility (Enter / Space opens/closes the envelope)
+    // Close when tapping outside the envelope
+    document.addEventListener('click', (e) => {
+      if (envelope && envelope.classList.contains('is-open')) {
+        if (!envelope.contains(e.target)) {
+          closeLetter();
+        }
+      }
+    });
+
+    // Keyboard accessibility (Enter / Space opens/closes the envelope, Escape closes)
     envelope.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        const isOpening = !envelope.classList.contains('is-open');
-        envelope.classList.toggle('is-open');
-        envelope.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+        if (envelope.classList.contains('is-open')) {
+          closeLetter();
+        } else {
+          openLetter();
+        }
+      } else if (e.key === 'Escape' && envelope.classList.contains('is-open')) {
+        closeLetter();
       }
+    });
+  }
+
+  if (closeLetterBtn) {
+    closeLetterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeLetter();
+    });
+  }
+
+  if (closeLetterBtnSecondary) {
+    closeLetterBtnSecondary.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeLetter();
     });
   }
 
@@ -1067,15 +1126,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Lazy load iframe on first trigger for 0% initial performance cost
-    if (!fireworksIframe.src || fireworksIframe.src.includes('about:blank')) {
-      if (fireworksIframe.dataset.src) {
-        fireworksIframe.src = fireworksIframe.dataset.src;
-      }
+    // Ensure iframe is loaded with fireworks source
+    const targetSrc = fireworksIframe.dataset.src || 'Efecto-fuegos-artificiales/index.html';
+    if (!fireworksIframe.src || fireworksIframe.src.includes('about:blank') || fireworksIframe.src === '') {
+      fireworksIframe.src = targetSrc;
     }
 
     fireworksModal.classList.add('active');
     fireworksModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 
     // Notify iframe to start audio once loaded
     const sendStartAudio = () => {
@@ -1106,6 +1165,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fireworksModal.classList.remove('active');
     fireworksModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+
+    // Free memory & kill 60fps canvas loop on mobile phones
+    setTimeout(() => {
+      if (!fireworksModal.classList.contains('active') && fireworksIframe) {
+        fireworksIframe.src = 'about:blank';
+      }
+    }, 200);
 
     // Resume main page background melody if it was playing before
     if (wasMusicPlayingBeforeFireworks) {

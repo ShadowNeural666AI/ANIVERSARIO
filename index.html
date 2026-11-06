@@ -1083,7 +1083,10 @@
                   <div class="top-fold"></div>
 
                   <!-- The Sliding Romantic Letter -->
-                  <div class="letter">
+                  <div class="letter" id="romantic-letter">
+                    <!-- Floating Close Button for Letter -->
+                    <button class="letter-close-btn" id="close-letter-btn" type="button" aria-label="Cerrar carta" title="Cerrar carta">✕</button>
+
                     <div class="letter-inner-content">
                       <div class="letter-header-filigree">
                         <span class="letter-filigree-line"></span>
@@ -1112,13 +1115,19 @@
                         <span class="sig-name">Aron ♡</span>
                       </div>
 
-                      <!-- Celebration button inside letter -->
-                      <button class="letter-celebrate-btn" id="open-fireworks-btn" type="button"
-                        title="Ver fuegos artificiales de celebración">
-                        <span class="btn-sparkle">✨</span>
-                        <span>¡Celebrar Nuestro Amor!</span>
-                        <span class="btn-sparkle">🎆</span>
-                      </button>
+                      <!-- Actions: Celebration button & Secondary Close button -->
+                      <div class="letter-actions-group">
+                        <button class="letter-celebrate-btn" id="open-fireworks-btn" type="button"
+                          title="Ver fuegos artificiales de celebración">
+                          <span class="btn-sparkle">✨</span>
+                          <span>¡Celebrar Nuestro Amor!</span>
+                          <span class="btn-sparkle">🎆</span>
+                        </button>
+                        <button class="letter-secondary-close-btn" id="close-letter-btn-secondary" type="button"
+                          aria-label="Cerrar carta">
+                          <span>Cerrar carta ♡</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -1807,16 +1807,25 @@ body {
   pointer-events: none;
 }
 
-/* Hover or .is-open (Tap support for mobile & desktop) */
-.envelope:hover,
+/* Opening is driven primarily by the .is-open class */
 .envelope.is-open {
   --envelope-transform: var(--envelope-transform-hover);
   --envelope-rotate-delay: var(--envelope-rotate-delay-hover);
 }
 
-.envelope:hover::after,
 .envelope.is-open::after {
   transform: translateX(-50%) scale(1.08);
+}
+
+/* Hover-to-open strictly for desktop devices with real mouse pointers */
+@media (hover: hover) and (pointer: fine) {
+  .envelope:hover {
+    --envelope-transform: var(--envelope-transform-hover);
+    --envelope-rotate-delay: var(--envelope-rotate-delay-hover);
+  }
+  .envelope:hover::after {
+    transform: translateX(-50%) scale(1.08);
+  }
 }
 
 .envelope-inner {
@@ -1863,8 +1872,10 @@ body {
   transition: transform 0.3s ease;
 }
 
-.envelope:hover .postage-stamp {
-  transform: rotate(0deg) scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .envelope:hover .postage-stamp {
+    transform: rotate(0deg) scale(1.05);
+  }
 }
 
 .svg-vintage-stamp {
@@ -2018,11 +2029,18 @@ body {
    Folds up (rotateX 180deg). Flap stays z-index 7 until passing 90deg (at 0.98s),
    then moves to z-index 1 behind the sliding-out letter!
 */
-.envelope:hover .top-fold,
 .envelope.is-open .top-fold {
   transform: rotateX(180deg);
   z-index: 1;
   transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s, z-index 0s ease 0.98s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .envelope:hover .top-fold {
+    transform: rotateX(180deg);
+    z-index: 1;
+    transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s, z-index 0s ease 0.98s;
+  }
 }
 
 /* --- THE ROMANTIC SLIDING LETTER ---
@@ -2047,27 +2065,77 @@ body {
   flex-direction: column;
   text-align: center;
   overflow: hidden;
-  transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1) 0.1s,
-              height 0.75s cubic-bezier(0.25, 1, 0.5, 1) 0.1s,
-              z-index 0s ease 0.4s;
+  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.1s,
+              height 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.1s,
+              z-index 0s ease 0.35s;
+  will-change: transform, height;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Floating Close Button for Letter (Immediate closing on mobile and desktop) */
+.letter-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(90, 10, 30, 0.88);
+  border: 1.5px solid var(--gold-primary);
+  color: #ffd700;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 8px rgba(255, 215, 0, 0.35);
+  transition: transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.letter-close-btn:hover,
+.letter-close-btn:active {
+  transform: scale(1.15);
+  background: #a4133c;
+  color: #ffffff;
 }
 
 /* When envelope is opened: letter slides UP and steps IN FRONT (z-index: 10)
    Full height 445px ensures the complete letter is visible without truncation!
 */
-.envelope:hover .letter,
 .envelope.is-open .letter {
   transform: translateX(-50%) translate3d(0, -195px, 20px);
   height: 445px;
   z-index: 10;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 16px 45px rgba(0, 0, 0, 0.92), 0 0 25px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.15);
-  transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1) 0.95s,
-              height 0.75s cubic-bezier(0.25, 1, 0.5, 1) 0.95s,
-              z-index 0s ease 1.15s;
+  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s,
+              height 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s,
+              z-index 0s ease 0.85s;
   scrollbar-width: thin;
   scrollbar-color: var(--gold-border) transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .envelope:hover .letter {
+    transform: translateX(-50%) translate3d(0, -195px, 20px);
+    height: 445px;
+    z-index: 10;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.92), 0 0 25px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.15);
+    transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s,
+                height 0.65s cubic-bezier(0.25, 1, 0.5, 1) 0.65s,
+                z-index 0s ease 0.85s;
+  }
 }
 
 .letter-inner-content {
@@ -2152,9 +2220,19 @@ body {
   font-weight: 700;
 }
 
+/* Actions Group inside letter (Celebrate & Close) */
+.letter-actions-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+}
+
 /* Button inside letter to trigger fireworks celebration */
 .letter-celebrate-btn {
-  margin-top: 10px;
+  margin-top: 0;
   padding: 10px 22px;
   background: linear-gradient(135deg, #8a0e2a 0%, #b81440 50%, #d4af37 100%);
   border: 1.5px solid #ffd700;
@@ -2170,6 +2248,32 @@ body {
   gap: 8px;
   box-shadow: 0 6px 18px rgba(184, 20, 64, 0.5), 0 0 14px rgba(255, 215, 0, 0.35);
   transition: transform 0.25s var(--trans-spring), box-shadow 0.25s ease, filter 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.letter-secondary-close-btn {
+  background: transparent;
+  border: 1px solid rgba(184, 134, 11, 0.45);
+  color: #7a0c24;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.letter-secondary-close-btn:hover,
+.letter-secondary-close-btn:active {
+  background: rgba(184, 134, 11, 0.12);
+  color: #500718;
+  border-color: #ffd700;
+  transform: scale(1.03);
 }
 
 .letter-celebrate-btn:hover {
@@ -2797,7 +2901,6 @@ body {
     font-size: 0.85rem;
   }
 
-  .envelope:hover .letter,
   .envelope.is-open .letter {
     transform: translateX(-50%) translate3d(0, -165px, 20px);
     height: 420px;
@@ -2991,7 +3094,6 @@ body {
     font-size: 0.8rem;
   }
 
-  .envelope:hover .letter,
   .envelope.is-open .letter {
     transform: translateX(-50%) translate3d(0, -150px, 20px);
     height: 410px;
