@@ -1037,6 +1037,22 @@ document.addEventListener('DOMContentLoaded', () => {
     envelope.setAttribute('aria-expanded', 'false');
   }
 
+  function handleCloseEvent(e) {
+    if (e.cancelable) e.preventDefault();
+    e.stopPropagation();
+    closeLetter();
+  }
+
+  if (closeLetterBtn) {
+    closeLetterBtn.addEventListener('click', handleCloseEvent);
+    closeLetterBtn.addEventListener('touchend', handleCloseEvent);
+  }
+
+  if (closeLetterBtnSecondary) {
+    closeLetterBtnSecondary.addEventListener('click', handleCloseEvent);
+    closeLetterBtnSecondary.addEventListener('touchend', handleCloseEvent);
+  }
+
   if (envelope) {
     envelope.addEventListener('click', (e) => {
       // If user clicked any close button inside the letter
@@ -1051,20 +1067,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // If user clicked or scrolled inside the letter text, keep it open (do not toggle!)
-      if (e.target.closest('.letter')) {
-        return;
-      }
-
-      // Toggle opening/closing when tapping on the envelope flap/body/seal
+      // If envelope is open:
       if (envelope.classList.contains('is-open')) {
+        // If user clicked inside reading content, keep it open for reading & scrolling
+        if (e.target.closest('.letter-inner-content')) {
+          return;
+        }
+        // Clicking anywhere else on the envelope or letter margins closes it immediately
         closeLetter();
       } else {
+        // If envelope is closed: opening it immediately
         openLetter();
       }
     });
 
-    // Close when tapping outside the envelope
+    // Close when tapping outside the envelope on desktop or mobile
     document.addEventListener('click', (e) => {
       if (envelope && envelope.classList.contains('is-open')) {
         if (!envelope.contains(e.target)) {
@@ -1073,7 +1090,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    document.addEventListener('touchend', (e) => {
+      if (envelope && envelope.classList.contains('is-open')) {
+        if (e.target.closest('#close-letter-btn') || e.target.closest('#close-letter-btn-secondary')) {
+          return;
+        }
+        if (!envelope.contains(e.target)) {
+          closeLetter();
+        }
+      }
+    }, { passive: true });
+
     // Keyboard accessibility (Enter / Space opens/closes the envelope, Escape closes)
+    window.addEventListener('keydown', (e) => {
+      if (envelope && envelope.classList.contains('is-open')) {
+        if (e.key === 'Escape') {
+          closeLetter();
+        }
+      }
+    });
+
     envelope.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -1082,23 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           openLetter();
         }
-      } else if (e.key === 'Escape' && envelope.classList.contains('is-open')) {
-        closeLetter();
       }
-    });
-  }
-
-  if (closeLetterBtn) {
-    closeLetterBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeLetter();
-    });
-  }
-
-  if (closeLetterBtnSecondary) {
-    closeLetterBtnSecondary.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeLetter();
     });
   }
 
