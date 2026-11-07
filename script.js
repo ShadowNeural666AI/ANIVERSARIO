@@ -1179,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeFireworksShow() {
     if (!fireworksModal) return;
 
-    // Stop all fireworks sounds immediately when exiting
+    // Stop all fireworks sounds and freeze canvas loop immediately
     try {
       if (fireworksIframe && fireworksIframe.contentWindow) {
         fireworksIframe.contentWindow.postMessage({ action: 'STOP_FIREWORKS_AUDIO' }, '*');
@@ -1189,13 +1189,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fireworksModal.classList.remove('active');
     fireworksModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-
-    // Free memory & kill 60fps canvas loop on mobile phones
-    setTimeout(() => {
-      if (!fireworksModal.classList.contains('active') && fireworksIframe) {
-        fireworksIframe.src = 'about:blank';
-      }
-    }, 200);
 
     // Resume main page background melody if it was playing before
     if (wasMusicPlayingBeforeFireworks) {

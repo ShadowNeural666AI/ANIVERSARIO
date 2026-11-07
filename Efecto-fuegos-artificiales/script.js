@@ -2232,138 +2232,46 @@ const soundManager = {
 		}
 	},
 
-	// Procedural synthesized sound engine (100% offline, immediate, zero delay, works on all devices)
-	playSynthesizedSound(type, scale = 1) {
-		if (!this.ctx) return;
-		try {
-			const ctx = this.ctx;
-			if (ctx.state === 'suspended') {
-				ctx.resume().catch(() => {});
-			}
-			const now = ctx.currentTime;
-			
-			if (type === 'lift') {
-				// Ascending whistling rocket whoosh
-				const osc = ctx.createOscillator();
-				const gain = ctx.createGain();
-				osc.type = 'sine';
-				osc.frequency.setValueAtTime(260 + Math.random() * 80, now);
-				osc.frequency.exponentialRampToValueAtTime(750 + Math.random() * 150, now + 0.55);
-				
-				gain.gain.setValueAtTime(0.001, now);
-				gain.gain.linearRampToValueAtTime(0.22 * scale, now + 0.15);
-				gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-				
-				osc.connect(gain);
-				gain.connect(ctx.destination);
-				osc.start(now);
-				osc.stop(now + 0.65);
-			} else if (type === 'burst' || type === 'burstSmall') {
-				// Deep resonant explosion boom + noise blast
-				const isSmall = type === 'burstSmall';
-				const dur = isSmall ? 0.45 : 0.9;
-				const baseFreq = isSmall ? 180 : 120;
-				const endFreq = isSmall ? 45 : 28;
-				const vol = (isSmall ? 0.35 : 0.85) * scale;
-				
-				// Low end thump
-				const osc = ctx.createOscillator();
-				const oscGain = ctx.createGain();
-				osc.type = 'triangle';
-				osc.frequency.setValueAtTime(baseFreq + Math.random() * 20, now);
-				osc.frequency.exponentialRampToValueAtTime(endFreq, now + dur * 0.7);
-				
-				oscGain.gain.setValueAtTime(vol * 0.9, now);
-				oscGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-				osc.connect(oscGain);
-				oscGain.connect(ctx.destination);
-				osc.start(now);
-				osc.stop(now + dur + 0.05);
-
-				// Noise rumble
-				const bufferSize = Math.floor(ctx.sampleRate * dur);
-				const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-				const output = noiseBuffer.getChannelData(0);
-				for (let i = 0; i < bufferSize; i++) {
-					output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.25));
-				}
-				const noise = ctx.createBufferSource();
-				noise.buffer = noiseBuffer;
-
-				const filter = ctx.createBiquadFilter();
-				filter.type = 'lowpass';
-				filter.frequency.setValueAtTime(isSmall ? 800 : 450, now);
-				filter.frequency.exponentialRampToValueAtTime(80, now + dur);
-
-				const noiseGain = ctx.createGain();
-				noiseGain.gain.setValueAtTime(vol * 0.7, now);
-				noiseGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-
-				noise.connect(filter);
-				filter.connect(noiseGain);
-				noiseGain.connect(ctx.destination);
-				noise.start(now);
-			} else if (type === 'crackle' || type === 'crackleSmall') {
-				// Golden sparkle crackles
-				const count = type === 'crackleSmall' ? 3 : 6;
-				for (let k = 0; k < count; k++) {
-					const delay = Math.random() * 0.22;
-					const popDur = 0.04 + Math.random() * 0.03;
-					const popOsc = ctx.createOscillator();
-					const popGain = ctx.createGain();
-					popOsc.type = 'square';
-					popOsc.frequency.setValueAtTime(1400 + Math.random() * 1200, now + delay);
-					popOsc.frequency.exponentialRampToValueAtTime(300, now + delay + popDur);
-					
-					popGain.gain.setValueAtTime(0.001, now);
-					popGain.gain.setValueAtTime(0.18 * scale, now + delay);
-					popGain.gain.exponentialRampToValueAtTime(0.001, now + delay + popDur);
-					
-					popOsc.connect(popGain);
-					popGain.connect(ctx.destination);
-					popOsc.start(now + delay);
-					popOsc.stop(now + delay + popDur + 0.02);
-				}
-			}
-		} catch (err) {}
-	},
-
 	preload() {
-		// Non-blocking background preload with 4s timeout per file
-		try {
-			const types = Object.keys(this.sources);
-			types.forEach(type => {
-				const source = this.sources[type];
-				const { fileNames } = source;
-				const filePromises = [];
-				fileNames.forEach(fileName => {
-					const fileURL = this.baseURL + fileName;
-					const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-					const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
-					const promise = fetch(fileURL, controller ? { signal: controller.signal } : {})
-						.then(res => {
-							if (timeoutId) clearTimeout(timeoutId);
-							return res.ok ? res.arrayBuffer() : null;
-						})
-						.then(data => {
-							if (!data) return null;
-							return new Promise(resolve => {
-								this.ctx.decodeAudioData(data, resolve, () => resolve(null));
-							});
-						})
-						.catch(() => null);
+		const allFilePromises = [];
 
-					filePromises.push(promise);
-				});
+		function checkStatus(response) {
+			if (response.status >= 200 && response.status < 300) {
+				return response;
+			}
+			const customError = new Error(response.statusText);
+			customError.response = response;
+			throw customError;
+		}
 
-				Promise.all(filePromises).then(buffers => {
-					const validBuffers = buffers.filter(Boolean);
-					if (validBuffers.length > 0) {
-						source.buffers = validBuffers;
-					}
-				}).catch(() => {});
+		const types = Object.keys(this.sources);
+		types.forEach(type => {
+			const source = this.sources[type];
+			const { fileNames } = source;
+			const filePromises = [];
+			fileNames.forEach(fileName => {
+				const fileURL = this.baseURL + fileName;
+				const promise = fetch(fileURL)
+					.then(checkStatus)
+					.then(response => response.arrayBuffer())
+					.then(data => new Promise(resolve => {
+						this.ctx.decodeAudioData(data, resolve, () => resolve(null));
+					}))
+					.catch(() => null);
+
+				filePromises.push(promise);
+				allFilePromises.push(promise);
 			});
-		} catch (e) {}
+
+			Promise.all(filePromises).then(buffers => {
+				const validBuffers = buffers.filter(Boolean);
+				if (validBuffers.length > 0) {
+					source.buffers = validBuffers;
+				}
+			}).catch(() => {});
+		});
+
+		return Promise.all(allFilePromises);
 	},
 	
 	pauseAll() {
@@ -2375,13 +2283,18 @@ const soundManager = {
 	},
 
 	resumeAll() {
-		try {
-			if (this.ctx && this.ctx.state !== 'running') {
-				this.ctx.resume().catch(() => {});
-			}
-		} catch (e) {}
+		// Play a sound with no volume for iOS. This 'unlocks' the audio context when the user first enables sound.
+		this.playSound('lift', 0);
+		setTimeout(() => {
+			try {
+				if (this.ctx && this.ctx.state !== 'running') {
+					this.ctx.resume().catch(() => {});
+				}
+			} catch (e) {}
+		}, 150);
 	},
 	
+	// Private property used to throttle small burst sounds.
 	_lastSmallBurstTime: 0,
 
 	playSound(type, scale = 1) {
@@ -2400,37 +2313,30 @@ const soundManager = {
 		}
 		
 		const source = this.sources[type];
-		if (!source) return;
+		if (!source || !source.buffers || source.buffers.length === 0) return;
 
-		// Play decoded buffer if available
-		if (source.buffers && source.buffers.length > 0) {
-			const buffer = MyMath.randomChoice(source.buffers);
-			if (buffer) {
-				try {
-					const initialVolume = source.volume;
-					const initialPlaybackRate = MyMath.random(
-						source.playbackRateMin,
-						source.playbackRateMax
-					);
-					const scaledVolume = initialVolume * scale;
-					const scaledPlaybackRate = initialPlaybackRate * (2 - scale);
-					
-					const gainNode = this.ctx.createGain();
-					gainNode.gain.value = scaledVolume;
+		const buffer = MyMath.randomChoice(source.buffers);
+		if (buffer) {
+			try {
+				const initialVolume = source.volume;
+				const initialPlaybackRate = MyMath.random(
+					source.playbackRateMin,
+					source.playbackRateMax
+				);
+				const scaledVolume = initialVolume * scale;
+				const scaledPlaybackRate = initialPlaybackRate * (2 - scale);
+				
+				const gainNode = this.ctx.createGain();
+				gainNode.gain.value = scaledVolume;
 
-					const bufferSource = this.ctx.createBufferSource();
-					bufferSource.playbackRate.value = scaledPlaybackRate;
-					bufferSource.buffer = buffer;
-					bufferSource.connect(gainNode);
-					gainNode.connect(this.ctx.destination);
-					bufferSource.start(0);
-					return;
-				} catch (e) {}
-			}
+				const bufferSource = this.ctx.createBufferSource();
+				bufferSource.playbackRate.value = scaledPlaybackRate;
+				bufferSource.buffer = buffer;
+				bufferSource.connect(gainNode);
+				gainNode.connect(this.ctx.destination);
+				bufferSource.start(0);
+			} catch (e) {}
 		}
-
-		// Procedural synthesis fallback
-		this.playSynthesizedSound(type, scale);
 	}
 };
 
@@ -2448,7 +2354,7 @@ window.startFireworksAudio = function() {
 };
 
 window.stopFireworksAudio = function() {
-	store.setState({ soundEnabled: false });
+	store.setState({ soundEnabled: false, paused: true });
 	soundManager.pauseAll();
 	if (soundManager.ctx && soundManager.ctx.state === 'running') {
 		soundManager.ctx.suspend().catch(() => {});
