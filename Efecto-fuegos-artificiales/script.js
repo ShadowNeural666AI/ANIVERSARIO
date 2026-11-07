@@ -229,11 +229,19 @@ function togglePause(toggle) {
 	}
 }
 
+let userExplicitlyMuted = false;
+
 function toggleSound(toggle) {
 	if (typeof toggle === 'boolean') {
 		store.setState({ soundEnabled: toggle });
 	} else {
 		store.setState({ soundEnabled: !store.state.soundEnabled });
+	}
+	if (!store.state.soundEnabled) {
+		userExplicitlyMuted = true;
+	} else {
+		userExplicitlyMuted = false;
+		if (soundManager) soundManager.unlock();
 	}
 }
 
@@ -1186,21 +1194,11 @@ let isUpdatingSpeed = false;
 
 function handlePointerStart(event) {
 	activePointerCount++;
-	const btnSize = 50;
-	
-	if (event.y < btnSize) {
-		if (event.x < btnSize) {
-			togglePause();
-			return;
-		}
-		if (event.x > mainStage.width/2 - btnSize/2 && event.x < mainStage.width/2 + btnSize/2) {
-			toggleSound();
-			return;
-		}
-		if (event.x > mainStage.width - btnSize) {
-			toggleMenu();
-			return;
-		}
+	if (soundManager) {
+		soundManager.unlock();
+	}
+	if (!store.state.soundEnabled && !userExplicitlyMuted) {
+		store.setState({ soundEnabled: true });
 	}
 	
 	if (!isRunning()) return;
@@ -2297,10 +2295,14 @@ const soundManager = {
 						.catch(() => loadFile(urls.slice(1)));
 				};
 
+				const isInsideSubfolder = (window.location.pathname || '').includes('Efecto-fuegos-artificiales');
+				const primaryLocal = isInsideSubfolder ? 'audio/' : 'assets/audio/fireworks/';
+				const secondaryLocal = isInsideSubfolder ? '../assets/audio/fireworks/' : 'Efecto-fuegos-artificiales/audio/';
 				const urlsToTry = [
-					'assets/audio/fireworks/' + fileName,
-					'Efecto-fuegos-artificiales/audio/' + fileName,
+					primaryLocal + fileName,
+					secondaryLocal + fileName,
 					'audio/' + fileName,
+					'assets/audio/fireworks/' + fileName,
 					this.baseURL + fileName
 				];
 				const promise = loadFile(urlsToTry);
@@ -2319,6 +2321,22 @@ const soundManager = {
 		return Promise.all(allFilePromises);
 	},
 	
+	unlock() {
+		try {
+			if (!this.ctx) {
+				this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+			}
+			if (this.ctx && this.ctx.state !== 'running') {
+				this.ctx.resume().catch(() => {});
+			}
+			const buf = this.ctx.createBuffer(1, 1, 22050);
+			const src = this.ctx.createBufferSource();
+			src.buffer = buf;
+			src.connect(this.ctx.destination);
+			src.start(0);
+		} catch (e) {}
+	},
+
 	pauseAll() {
 		try {
 			if (this.ctx && this.ctx.state === 'running') {
@@ -2328,15 +2346,8 @@ const soundManager = {
 	},
 
 	resumeAll() {
-		// Play a sound with no volume for iOS. This 'unlocks' the audio context when the user first enables sound.
+		this.unlock();
 		this.playSound('lift', 0);
-		setTimeout(() => {
-			try {
-				if (this.ctx && this.ctx.state !== 'running') {
-					this.ctx.resume().catch(() => {});
-				}
-			} catch (e) {}
-		}, 150);
 	},
 	
 	// Private property used to throttle small burst sounds.
@@ -2347,6 +2358,10 @@ const soundManager = {
 
 		if (!canPlaySoundSelector() || simSpeed < 0.95) {
 			return;
+		}
+
+		if (this.ctx && this.ctx.state === 'suspended') {
+			this.ctx.resume().catch(() => {});
 		}
 		
 		if (type === 'burstSmall') {
@@ -2385,6 +2400,8 @@ const soundManager = {
 	}
 };
 
+window.soundManager = soundManager;
+
 // Global controls for native & modal communication
 window.startFireworks = function() {
 	if (appNodes && appNodes.stageContainer) {
@@ -2411,6 +2428,29 @@ window.stopFireworks = function() {
 	if (soundManager.ctx && soundManager.ctx.state === 'running') {
 		soundManager.ctx.suspend().catch(() => {});
 	}
+};
+
+// Activar sonido automáticamente al primer click o toque del usuario
+function userGestureUnlockAudio(e) {
+	if (e && e.target && e.target.closest && e.target.closest('.sound-btn')) return;
+	if (userExplicitlyMuted) return;
+
+	if (soundManager) {
+		soundManager.unlock();
+	}
+	if (!store.state.soundEnabled) {
+		store.setState({ soundEnabled: true });
+	}
+}
+
+['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown'].forEach(evt => {
+	window.addEventListener(evt, userGestureUnlockAudio, { passive: true });
+	document.addEventListener(evt, userGestureUnlockAudio, { passive: true });
+});
+
+window.unlockFireworksAudio = function() {
+	if (soundManager) soundManager.unlock();
+	store.setState({ soundEnabled: true });
 };
 
 window.startFireworksAudio = window.startFireworks;

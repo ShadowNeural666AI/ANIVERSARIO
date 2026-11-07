@@ -1150,6 +1150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'hidden';
 
     // Start native fireworks visually and audibly immediately!
+    if (typeof window.unlockFireworksAudio === 'function') {
+      window.unlockFireworksAudio();
+    }
     if (typeof window.startFireworks === 'function') {
       window.startFireworks();
     }
