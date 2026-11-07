@@ -126,7 +126,7 @@ const store = {
 			autoLaunch: true,
 			finale: false,
 			skyLighting: SKY_LIGHT_NORMAL + '',
-			hideControls: true,
+			hideControls: false,
 			longExposure: false,
 			scaleFactor: getDefaultScaleFactor()
 		}
@@ -496,6 +496,36 @@ appNodes.helpModalCloseBtn.addEventListener('click', () => {
 appNodes.helpModalOverlay.addEventListener('click', () => {
 	store.setState({ openHelpTopic: null });
 });
+
+if (appNodes.pauseBtn) {
+	appNodes.pauseBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		togglePause();
+	});
+}
+
+if (appNodes.soundBtn) {
+	appNodes.soundBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleSound();
+	});
+}
+
+const fireworksSettingsBtn = document.querySelector('.settings-btn');
+if (fireworksSettingsBtn) {
+	fireworksSettingsBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleMenu();
+	});
+}
+
+const fireworksCloseMenuBtn = document.querySelector('.close-menu-btn');
+if (fireworksCloseMenuBtn) {
+	fireworksCloseMenuBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleMenu(false);
+	});
+}
 
 
 
@@ -867,8 +897,13 @@ function init() {
 		);
 	}
 	
-	// Begin simulation
-	togglePause(false);
+	// Begin simulation if modal is already active or if standalone; keep paused if modal is inactive
+	const modal = document.getElementById('fireworks-modal');
+	if (modal && !modal.classList.contains('active')) {
+		togglePause(true);
+	} else {
+		togglePause(false);
+	}
 	
 	// initial render
 	renderApp(store.state);
@@ -2250,15 +2285,25 @@ const soundManager = {
 			const { fileNames } = source;
 			const filePromises = [];
 			fileNames.forEach(fileName => {
-				const fileURL = this.baseURL + fileName;
-				const promise = fetch(fileURL)
-					.then(checkStatus)
-					.then(response => response.arrayBuffer())
-					.then(data => new Promise(resolve => {
-						this.ctx.decodeAudioData(data, resolve, () => resolve(null));
-					}))
-					.catch(() => null);
+				const loadFile = (urls) => {
+					if (!urls.length) return Promise.resolve(null);
+					const url = urls[0];
+					return fetch(url)
+						.then(checkStatus)
+						.then(response => response.arrayBuffer())
+						.then(data => new Promise(resolve => {
+							this.ctx.decodeAudioData(data, resolve, () => resolve(null));
+						}))
+						.catch(() => loadFile(urls.slice(1)));
+				};
 
+				const urlsToTry = [
+					'assets/audio/fireworks/' + fileName,
+					'Efecto-fuegos-artificiales/audio/' + fileName,
+					'audio/' + fileName,
+					this.baseURL + fileName
+				];
+				const promise = loadFile(urlsToTry);
 				filePromises.push(promise);
 				allFilePromises.push(promise);
 			});
@@ -2340,26 +2385,36 @@ const soundManager = {
 	}
 };
 
-// Global audio controls for modal communication
-window.startFireworksAudio = function() {
+// Global controls for native & modal communication
+window.startFireworks = function() {
 	if (appNodes && appNodes.stageContainer) {
 		appNodes.stageContainer.classList.remove('remove');
 	}
 	handleResize();
+	togglePause(false);
 	store.setState({ soundEnabled: true, paused: false });
 	if (soundManager.ctx && soundManager.ctx.state !== 'running') {
 		soundManager.ctx.resume().catch(() => {});
 	}
 	soundManager.resumeAll();
+	setTimeout(handleResize, 50);
+	setTimeout(handleResize, 150);
+	try {
+		seqRandomShell();
+	} catch (e) {}
 };
 
-window.stopFireworksAudio = function() {
+window.stopFireworks = function() {
+	togglePause(true);
 	store.setState({ soundEnabled: false, paused: true });
 	soundManager.pauseAll();
 	if (soundManager.ctx && soundManager.ctx.state === 'running') {
 		soundManager.ctx.suspend().catch(() => {});
 	}
 };
+
+window.startFireworksAudio = window.startFireworks;
+window.stopFireworksAudio = window.stopFireworks;
 
 window.addEventListener('message', function(e) {
 	if (e.data && (e.data.action === 'START_FIREWORKS_AUDIO' || e.data.action === 'START_FIREWORKS')) {

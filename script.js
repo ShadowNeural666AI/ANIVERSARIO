@@ -1123,17 +1123,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     11. CELEBRATION FIREWORKS MODAL (EFECTO FUEGOS ARTIFICIALES ADAPTADO)
+     11. CELEBRATION FIREWORKS MODAL (NATIVO - EFECTO FUEGOS ARTIFICIALES)
      ========================================================================== */
   const fireworksModal = document.getElementById('fireworks-modal');
-  const fireworksIframe = document.getElementById('fireworks-iframe');
   const fireworksModalClose = document.getElementById('fireworks-modal-close');
   const btnOpenFireworks = document.getElementById('open-fireworks-btn');
 
   let wasMusicPlayingBeforeFireworks = false;
 
   function openFireworksShow() {
-    if (!fireworksModal || !fireworksIframe) return;
+    if (!fireworksModal) return;
 
     // Pause main page melody so fireworks audio is heard loud and crisp
     if (isPlaying) {
@@ -1146,45 +1145,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Ensure iframe is loaded with fireworks source
-    const targetSrc = fireworksIframe.dataset.src || 'Efecto-fuegos-artificiales/index.html';
-    if (!fireworksIframe.src || fireworksIframe.src.includes('about:blank') || fireworksIframe.src === '') {
-      fireworksIframe.src = targetSrc;
-    }
-
     fireworksModal.classList.add('active');
     fireworksModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
 
-    // Notify iframe to start visuals and audio once loaded
-    const sendStartFireworks = () => {
-      try {
-        if (fireworksIframe && fireworksIframe.contentWindow) {
-          fireworksIframe.contentWindow.postMessage({ action: 'START_FIREWORKS_AUDIO' }, '*');
-          fireworksIframe.contentWindow.postMessage({ action: 'RESIZE_FIREWORKS' }, '*');
-        }
-      } catch (err) {}
-    };
-
-    if (fireworksIframe.contentDocument && fireworksIframe.contentDocument.readyState === 'complete') {
-      sendStartFireworks();
-    } else {
-      fireworksIframe.onload = sendStartFireworks;
+    // Start native fireworks visually and audibly immediately!
+    if (typeof window.startFireworks === 'function') {
+      window.startFireworks();
     }
-    setTimeout(sendStartFireworks, 150);
-    setTimeout(sendStartFireworks, 400);
-    setTimeout(sendStartFireworks, 800);
   }
 
   function closeFireworksShow() {
     if (!fireworksModal) return;
 
-    // Stop all fireworks sounds and freeze canvas loop immediately
-    try {
-      if (fireworksIframe && fireworksIframe.contentWindow) {
-        fireworksIframe.contentWindow.postMessage({ action: 'STOP_FIREWORKS_AUDIO' }, '*');
-      }
-    } catch (err) {}
+    // Stop native fireworks immediately
+    if (typeof window.stopFireworks === 'function') {
+      window.stopFireworks();
+    }
 
     fireworksModal.classList.remove('active');
     fireworksModal.setAttribute('aria-hidden', 'true');

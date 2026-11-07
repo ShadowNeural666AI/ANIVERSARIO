@@ -227,6 +227,10 @@ const Stage = (function StageFactory(window, document, Ticker) {
 	};
 	// handle interaction
 	Stage.mouseHandler = function mouseHandler(evt) {
+		const modal = document.getElementById('fireworks-modal');
+		if (modal && !modal.classList.contains('active')) return;
+		if (evt.target && evt.target.closest('#fireworks-modal-close, .controls, .menu, .help-modal')) return;
+
     // Prevent mouse events from firing immediately after touch events
     if (Date.now() - lastTouchTimestamp < 500) {
       return;
@@ -245,6 +249,10 @@ const Stage = (function StageFactory(window, document, Ticker) {
 		});
 	};
 	Stage.touchHandler = function touchHandler(evt) {
+		const modal = document.getElementById('fireworks-modal');
+		if (modal && !modal.classList.contains('active')) return;
+		if (evt.target && evt.target.closest('#fireworks-modal-close, .controls, .menu, .help-modal')) return;
+
     lastTouchTimestamp = Date.now();
     
     // Set generic event type

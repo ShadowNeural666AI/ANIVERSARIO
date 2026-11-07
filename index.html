@@ -1236,15 +1236,181 @@
   <!-- ======================================================================
        CELEBRATION FIREWORKS FULLSCREEN MODAL (Efecto-fuegos-artificiales)
        ====================================================================== -->
+  <!-- ======================================================================
+       CELEBRATION FIREWORKS FULLSCREEN MODAL (NATIVO - EFECTO FUEGOS ARTIFICIALES)
+       ====================================================================== -->
   <div id="fireworks-modal" class="modal-backdrop fireworks-modal-backdrop" aria-hidden="true">
     <div class="fireworks-modal-dialog">
       <button class="fireworks-modal-close-btn" id="fireworks-modal-close"
         aria-label="Cerrar fuegos artificiales">&times;</button>
-      <iframe src="about:blank" data-src="Efecto-fuegos-artificiales/index.html" class="fireworks-iframe"
-        id="fireworks-iframe" title="Fuegos artificiales de celebración Estrella y Aron"></iframe>
+
+      <!-- SVG Spritesheet for fireworks controls -->
+      <div style="height: 0; width: 0; position: absolute; visibility: hidden;">
+        <svg xmlns="http://www.w3.org/2000/svg">
+          <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+          <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></symbol>
+          <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+          <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+          <symbol id="icon-sound-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></symbol>
+          <symbol id="icon-sound-off" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></symbol>
+        </svg>
+      </div>
+
+      <!-- Native Fireworks Stage Container -->
+      <div class="stage-container" id="fireworks-stage-container">
+        <div class="canvas-container">
+          <canvas id="trails-canvas"></canvas>
+          <canvas id="main-canvas"></canvas>
+        </div>
+
+        <!-- Romantic Celebration Overlay -->
+        <div class="anniversary-fireworks-overlay" id="fireworks-overlay" aria-hidden="false">
+          <div class="fw-badge-pill">
+            <span class="fw-pill-heart">❤</span>
+            <span class="fw-pill-icon">📅</span>
+            <span class="fw-pill-text">07 DE NOVIEMBRE · 3 AÑOS JUNTOS</span>
+            <span class="fw-pill-heart">❤</span>
+          </div>
+
+          <div class="fw-intertwined-hearts" aria-hidden="true">
+            <svg viewBox="0 0 70 34" class="svg-fw-double-heart">
+              <path d="M18 10 C12 0, 0 5, 0 17 C0 26, 18 33, 18 33 C18 33, 36 26, 36 17 C36 5, 24 0, 18 10 Z" fill="none" stroke="#ffd700" stroke-width="2.2" filter="drop-shadow(0 0 10px rgba(255,215,0,0.9))" />
+              <path d="M42 10 C36 0, 24 5, 24 17 C24 26, 42 33, 42 33 C42 33, 60 26, 60 17 C60 5, 48 0, 42 10 Z" fill="none" stroke="#fff8db" stroke-width="2.2" stroke-dasharray="3 1.5" filter="drop-shadow(0 0 10px rgba(255,215,0,0.9))" />
+            </svg>
+          </div>
+
+          <div class="fw-couple-title-wrap">
+            <h1 class="fw-couple-names">Estrella &amp; Aron</h1>
+          </div>
+
+          <p class="fw-dedication-subtitle">
+            ¡Que nuestro <span class="fw-script-italic-gold">amor</span> brille más fuerte que cualquier estrella! <span class="fw-red-neon-heart">♡</span>
+          </p>
+
+          <div class="fw-interaction-hint">
+            <div class="fw-hint-filigree">
+              <span class="fw-hint-line"></span>
+              <span class="fw-hint-accent-heart">♡</span>
+              <span class="fw-hint-line"></span>
+            </div>
+            <p class="fw-hint-text">Toca o haz clic en cualquier lugar para lanzar fuegos artificiales</p>
+            <div class="fw-hint-bottom-heart">♡</div>
+          </div>
+        </div>
+
+        <!-- Glowing Crimson & Gold Clouds Floor -->
+        <div class="fw-celestial-clouds-floor" aria-hidden="true">
+          <div class="clouds-glow-radiance"></div>
+          <svg viewBox="0 0 1440 260" class="svg-celestial-clouds" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="cloud-crimson-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ff1a4b" stop-opacity="0.85" />
+                <stop offset="30%" stop-color="#a4133c" stop-opacity="0.92" />
+                <stop offset="65%" stop-color="#590d22" stop-opacity="0.96" />
+                <stop offset="100%" stop-color="#140106" stop-opacity="0.99" />
+              </linearGradient>
+              <linearGradient id="cloud-gold-rim" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ffd700" stop-opacity="0.2" />
+                <stop offset="35%" stop-color="#fff5cc" stop-opacity="0.95" />
+                <stop offset="50%" stop-color="#ffd700" stop-opacity="1" />
+                <stop offset="65%" stop-color="#ff8500" stop-opacity="0.85" />
+                <stop offset="100%" stop-color="#ffd700" stop-opacity="0.2" />
+              </linearGradient>
+              <filter id="cloud-blur" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="8" />
+              </filter>
+            </defs>
+            <path d="M 0,140 Q 180,60 380,120 Q 600,40 820,110 Q 1060,50 1260,110 Q 1380,80 1440,120 L 1440,260 L 0,260 Z" fill="url(#cloud-crimson-grad)" opacity="0.65" filter="url(#cloud-blur)" />
+            <path d="M 0,180 Q 220,90 440,150 Q 720,80 960,140 Q 1200,90 1440,150 L 1440,260 L 0,260 Z" fill="url(#cloud-crimson-grad)" opacity="0.95" />
+            <path d="M 0,180 Q 220,90 440,150 Q 720,80 960,140 Q 1200,90 1440,150" fill="none" stroke="url(#cloud-gold-rim)" stroke-width="3.5" filter="url(#cloud-blur)" opacity="0.85" />
+          </svg>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <div class="btn pause-btn" title="Pausar / Reanudar">
+            <svg fill="white" width="24" height="24"><use href="#icon-pause" xlink:href="#icon-pause"></use></svg>
+          </div>
+          <div class="btn sound-btn" title="Activar / Silenciar Sonido">
+            <svg fill="white" width="24" height="24"><use href="#icon-sound-on" xlink:href="#icon-sound-on"></use></svg>
+          </div>
+          <div class="btn settings-btn" title="Configuración">
+            <svg fill="white" width="24" height="24"><use href="#icon-settings" xlink:href="#icon-settings"></use></svg>
+          </div>
+        </div>
+
+        <!-- Settings Menu -->
+        <div class="menu hide">
+          <div class="menu__inner-wrap">
+            <div class="btn btn--bright close-menu-btn" title="Cerrar menú">
+              <svg fill="white" width="24" height="24"><use href="#icon-close" xlink:href="#icon-close"></use></svg>
+            </div>
+            <div class="menu__header">Configuración</div>
+            <div class="menu__subheader">Personaliza los fuegos artificiales</div>
+            <form>
+              <div class="form-option form-option--select">
+                <label class="shell-type-label">Tipo de bomba</label>
+                <select class="shell-type"></select>
+              </div>
+              <div class="form-option form-option--select">
+                <label class="shell-size-label">Tamaño</label>
+                <select class="shell-size"></select>
+              </div>
+              <div class="form-option form-option--select">
+                <label class="quality-ui-label">Calidad</label>
+                <select class="quality-ui"></select>
+              </div>
+              <div class="form-option form-option--select">
+                <label class="sky-lighting-label">Iluminación cielo</label>
+                <select class="sky-lighting"></select>
+              </div>
+              <div class="form-option form-option--select">
+                <label class="scaleFactor-label">Escala</label>
+                <select class="scaleFactor"></select>
+              </div>
+              <div class="form-option form-option--checkbox">
+                <label class="auto-launch-label">Disparo Automático</label>
+                <input class="auto-launch" type="checkbox" />
+              </div>
+              <div class="form-option form-option--checkbox form-option--finale-mode">
+                <label class="finale-mode-label">Modo Final Épico</label>
+                <input class="finale-mode" type="checkbox" />
+              </div>
+              <div class="form-option form-option--checkbox">
+                <label class="hide-controls-label">Ocultar Controles</label>
+                <input class="hide-controls" type="checkbox" />
+              </div>
+              <div class="form-option form-option--checkbox form-option--fullscreen">
+                <label class="fullscreen-label">Pantalla Completa</label>
+                <input class="fullscreen" type="checkbox" />
+              </div>
+              <div class="form-option form-option--checkbox">
+                <label class="long-exposure-label">Estela Larga</label>
+                <input class="long-exposure" type="checkbox" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Modal -->
+      <div class="help-modal">
+        <div class="help-modal__overlay"></div>
+        <div class="help-modal__dialog">
+          <div class="help-modal__header"></div>
+          <div class="help-modal__body"></div>
+          <button type="button" class="help-modal__close-btn">Cerrar</button>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Native Fireworks Scripts -->
+  <script src="Efecto-fuegos-artificiales/fscreen.js"></script>
+  <script src="Efecto-fuegos-artificiales/Stage.js"></script>
+  <script src="Efecto-fuegos-artificiales/MyMath.js"></script>
+  <script src="Efecto-fuegos-artificiales/script.js"></script>
+  <!-- Main Application Script -->
   <script src="script.js"></script>
 </body>
 
