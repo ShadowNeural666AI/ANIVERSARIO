@@ -1156,21 +1156,24 @@ document.addEventListener('DOMContentLoaded', () => {
     fireworksModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
 
-    // Notify iframe to start audio once loaded
-    const sendStartAudio = () => {
+    // Notify iframe to start visuals and audio once loaded
+    const sendStartFireworks = () => {
       try {
         if (fireworksIframe && fireworksIframe.contentWindow) {
           fireworksIframe.contentWindow.postMessage({ action: 'START_FIREWORKS_AUDIO' }, '*');
+          fireworksIframe.contentWindow.postMessage({ action: 'RESIZE_FIREWORKS' }, '*');
         }
       } catch (err) {}
     };
 
     if (fireworksIframe.contentDocument && fireworksIframe.contentDocument.readyState === 'complete') {
-      sendStartAudio();
+      sendStartFireworks();
     } else {
-      fireworksIframe.onload = sendStartAudio;
+      fireworksIframe.onload = sendStartFireworks;
     }
-    setTimeout(sendStartAudio, 400);
+    setTimeout(sendStartFireworks, 150);
+    setTimeout(sendStartFireworks, 400);
+    setTimeout(sendStartFireworks, 800);
   }
 
   function closeFireworksShow() {

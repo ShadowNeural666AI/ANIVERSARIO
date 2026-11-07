@@ -817,42 +817,55 @@ const shellTypes = {
 const shellNames = Object.keys(shellTypes);
 
 function init() {
-	// Remove loading state
-	document.querySelector('.loading-init').remove();
-	appNodes.stageContainer.classList.remove('remove');
+	// Remove loading state safely
+	const loadingNode = document.querySelector('.loading-init');
+	if (loadingNode) loadingNode.remove();
+	if (appNodes.stageContainer) {
+		appNodes.stageContainer.classList.remove('remove');
+	}
+	
+	// Force canvas sizing immediately
+	handleResize();
 	
 	// Populate dropdowns
 	function setOptionsForSelect(node, options) {
+		if (!node) return;
 		node.innerHTML = options.reduce((acc, opt) => acc += `<option value="${opt.value}">${opt.label}</option>`, '');
 	}
 
 	// shell type
 	let options = '';
 	shellNames.forEach(opt => options += `<option value="${opt}">${opt}</option>`);
-	appNodes.shellType.innerHTML = options;
+	if (appNodes.shellType) appNodes.shellType.innerHTML = options;
 	// shell size
 	options = '';
 	['3"', '4"', '6"', '8"', '12"', '16"'].forEach((opt, i) => options += `<option value="${i}">${opt}</option>`);
-	appNodes.shellSize.innerHTML = options;
+	if (appNodes.shellSize) appNodes.shellSize.innerHTML = options;
 	
-	setOptionsForSelect(appNodes.quality, [
-		{ label: 'Low', value: QUALITY_LOW },
-		{ label: 'Normal', value: QUALITY_NORMAL },
-		{ label: 'High', value: QUALITY_HIGH }
-	]);
+	if (appNodes.quality) {
+		setOptionsForSelect(appNodes.quality, [
+			{ label: 'Low', value: QUALITY_LOW },
+			{ label: 'Normal', value: QUALITY_NORMAL },
+			{ label: 'High', value: QUALITY_HIGH }
+		]);
+	}
 	
-	setOptionsForSelect(appNodes.skyLighting, [
-		{ label: 'None', value: SKY_LIGHT_NONE },
-		{ label: 'Dim', value: SKY_LIGHT_DIM },
-		{ label: 'Normal', value: SKY_LIGHT_NORMAL }
-	]);
+	if (appNodes.skyLighting) {
+		setOptionsForSelect(appNodes.skyLighting, [
+			{ label: 'None', value: SKY_LIGHT_NONE },
+			{ label: 'Dim', value: SKY_LIGHT_DIM },
+			{ label: 'Normal', value: SKY_LIGHT_NORMAL }
+		]);
+	}
 	
 	// 0.9 is mobile default
-	setOptionsForSelect(
-		appNodes.scaleFactor,
-		[0.5, 0.62, 0.75, 0.9, 1.0, 1.5, 2.0]
-		.map(value => ({ value: value.toFixed(2), label: `${value*100}%` }))
-	);
+	if (appNodes.scaleFactor) {
+		setOptionsForSelect(
+			appNodes.scaleFactor,
+			[0.5, 0.62, 0.75, 0.9, 1.0, 1.5, 2.0]
+			.map(value => ({ value: value.toFixed(2), label: `${value*100}%` }))
+		);
+	}
 	
 	// Begin simulation
 	togglePause(false);
@@ -2175,7 +2188,7 @@ const Spark = {
 
 const soundManager = {
 	baseURL: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/',
-	ctx: new (window.AudioContext || window.webkitAudioContext),
+	ctx: new (window.AudioContext || window.webkitAudioContext)(),
 	sources: {
 		lift: {
 			volume: 1,
@@ -2219,89 +2232,165 @@ const soundManager = {
 		}
 	},
 
-	preload() {
-		const allFilePromises = [];
-
-		function checkStatus(response) {
-			if (response.status >= 200 && response.status < 300) {
-				return response;
+	// Procedural synthesized sound engine (100% offline, immediate, zero delay, works on all devices)
+	playSynthesizedSound(type, scale = 1) {
+		if (!this.ctx) return;
+		try {
+			const ctx = this.ctx;
+			if (ctx.state === 'suspended') {
+				ctx.resume().catch(() => {});
 			}
-			const customError = new Error(response.statusText);
-			customError.response = response;
-			throw customError;
-		}
+			const now = ctx.currentTime;
+			
+			if (type === 'lift') {
+				// Ascending whistling rocket whoosh
+				const osc = ctx.createOscillator();
+				const gain = ctx.createGain();
+				osc.type = 'sine';
+				osc.frequency.setValueAtTime(260 + Math.random() * 80, now);
+				osc.frequency.exponentialRampToValueAtTime(750 + Math.random() * 150, now + 0.55);
+				
+				gain.gain.setValueAtTime(0.001, now);
+				gain.gain.linearRampToValueAtTime(0.22 * scale, now + 0.15);
+				gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+				
+				osc.connect(gain);
+				gain.connect(ctx.destination);
+				osc.start(now);
+				osc.stop(now + 0.65);
+			} else if (type === 'burst' || type === 'burstSmall') {
+				// Deep resonant explosion boom + noise blast
+				const isSmall = type === 'burstSmall';
+				const dur = isSmall ? 0.45 : 0.9;
+				const baseFreq = isSmall ? 180 : 120;
+				const endFreq = isSmall ? 45 : 28;
+				const vol = (isSmall ? 0.35 : 0.85) * scale;
+				
+				// Low end thump
+				const osc = ctx.createOscillator();
+				const oscGain = ctx.createGain();
+				osc.type = 'triangle';
+				osc.frequency.setValueAtTime(baseFreq + Math.random() * 20, now);
+				osc.frequency.exponentialRampToValueAtTime(endFreq, now + dur * 0.7);
+				
+				oscGain.gain.setValueAtTime(vol * 0.9, now);
+				oscGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+				osc.connect(oscGain);
+				oscGain.connect(ctx.destination);
+				osc.start(now);
+				osc.stop(now + dur + 0.05);
 
-		const types = Object.keys(this.sources);
-		types.forEach(type => {
-			const source = this.sources[type];
-			const { fileNames } = source;
-			const filePromises = [];
-			fileNames.forEach(fileName => {
-				const fileURL = this.baseURL + fileName;
-				// Promise will resolve with decoded audio buffer.
-				const promise = fetch(fileURL)
-					.then(checkStatus)
-					.then(response => response.arrayBuffer())
-					.then(data => new Promise(resolve => {
-						this.ctx.decodeAudioData(data, resolve);
-					}));
+				// Noise rumble
+				const bufferSize = Math.floor(ctx.sampleRate * dur);
+				const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+				const output = noiseBuffer.getChannelData(0);
+				for (let i = 0; i < bufferSize; i++) {
+					output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.25));
+				}
+				const noise = ctx.createBufferSource();
+				noise.buffer = noiseBuffer;
 
-				filePromises.push(promise);
-				allFilePromises.push(promise);
-			});
+				const filter = ctx.createBiquadFilter();
+				filter.type = 'lowpass';
+				filter.frequency.setValueAtTime(isSmall ? 800 : 450, now);
+				filter.frequency.exponentialRampToValueAtTime(80, now + dur);
 
-			Promise.all(filePromises)
-				.then(buffers => {
-					source.buffers = buffers;
+				const noiseGain = ctx.createGain();
+				noiseGain.gain.setValueAtTime(vol * 0.7, now);
+				noiseGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+				noise.connect(filter);
+				filter.connect(noiseGain);
+				noiseGain.connect(ctx.destination);
+				noise.start(now);
+			} else if (type === 'crackle' || type === 'crackleSmall') {
+				// Golden sparkle crackles
+				const count = type === 'crackleSmall' ? 3 : 6;
+				for (let k = 0; k < count; k++) {
+					const delay = Math.random() * 0.22;
+					const popDur = 0.04 + Math.random() * 0.03;
+					const popOsc = ctx.createOscillator();
+					const popGain = ctx.createGain();
+					popOsc.type = 'square';
+					popOsc.frequency.setValueAtTime(1400 + Math.random() * 1200, now + delay);
+					popOsc.frequency.exponentialRampToValueAtTime(300, now + delay + popDur);
+					
+					popGain.gain.setValueAtTime(0.001, now);
+					popGain.gain.setValueAtTime(0.18 * scale, now + delay);
+					popGain.gain.exponentialRampToValueAtTime(0.001, now + delay + popDur);
+					
+					popOsc.connect(popGain);
+					popGain.connect(ctx.destination);
+					popOsc.start(now + delay);
+					popOsc.stop(now + delay + popDur + 0.02);
+				}
+			}
+		} catch (err) {}
+	},
+
+	preload() {
+		// Non-blocking background preload with 4s timeout per file
+		try {
+			const types = Object.keys(this.sources);
+			types.forEach(type => {
+				const source = this.sources[type];
+				const { fileNames } = source;
+				const filePromises = [];
+				fileNames.forEach(fileName => {
+					const fileURL = this.baseURL + fileName;
+					const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+					const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+					const promise = fetch(fileURL, controller ? { signal: controller.signal } : {})
+						.then(res => {
+							if (timeoutId) clearTimeout(timeoutId);
+							return res.ok ? res.arrayBuffer() : null;
+						})
+						.then(data => {
+							if (!data) return null;
+							return new Promise(resolve => {
+								this.ctx.decodeAudioData(data, resolve, () => resolve(null));
+							});
+						})
+						.catch(() => null);
+
+					filePromises.push(promise);
 				});
-		});
 
-		return Promise.all(allFilePromises);
+				Promise.all(filePromises).then(buffers => {
+					const validBuffers = buffers.filter(Boolean);
+					if (validBuffers.length > 0) {
+						source.buffers = validBuffers;
+					}
+				}).catch(() => {});
+			});
+		} catch (e) {}
 	},
 	
 	pauseAll() {
-		this.ctx.suspend();
+		try {
+			if (this.ctx && this.ctx.state === 'running') {
+				this.ctx.suspend();
+			}
+		} catch (e) {}
 	},
 
 	resumeAll() {
-		// Play a sound with no volume for iOS. This 'unlocks' the audio context when the user first enables sound.
-		this.playSound('lift', 0);
-		// Chrome mobile requires interaction before starting audio context.
-		// The sound toggle button is triggered on 'touchstart', which doesn't seem to count as a full
-		// interaction to Chrome. I guess it needs a click? At any rate if the first thing the user does
-		// is enable audio, it doesn't work. Using a setTimeout allows the first interaction to be registered.
-		// Perhaps a better solution is to track whether the user has interacted, and if not but they try enabling
-		// sound, show a tooltip that they should tap again to enable sound.
-		setTimeout(() => {
-			this.ctx.resume();
-		}, 250);
+		try {
+			if (this.ctx && this.ctx.state !== 'running') {
+				this.ctx.resume().catch(() => {});
+			}
+		} catch (e) {}
 	},
 	
-	// Private property used to throttle small burst sounds.
 	_lastSmallBurstTime: 0,
 
-	/**
-	 * Play a sound of `type`. Will randomly pick a file associated with type, and play it at the specified volume
-	 * and play speed, with a bit of random variance in play speed. This is all based on `sources` config.
-	 *
-	 * @param  {string} type - The type of sound to play.
-	 * @param  {?number} scale=1 - Value between 0 and 1 (values outside range will be clamped). Scales less than one
-	 *                             descrease volume and increase playback speed. This is because large explosions are
-	 *                             louder, deeper, and reverberate longer than small explosions.
-	 *                             Note that a scale of 0 will mute the sound.
-	 */
-	playSound(type, scale=1) {
-		// Ensure `scale` is within valid range.
+	playSound(type, scale = 1) {
 		scale = MyMath.clamp(scale, 0, 1);
 
-		// Disallow starting new sounds if sound is disabled, app is running in slow motion, or paused.
-		// Slow motion check has some wiggle room in case user doesn't finish dragging the speed bar
-		// *all* the way back.
 		if (!canPlaySoundSelector() || simSpeed < 0.95) {
 			return;
 		}
 		
-		// Throttle small bursts, since floral/falling leaves shells have a lot of them.
 		if (type === 'burstSmall') {
 			const now = Date.now();
 			if (now - this._lastSmallBurstTime < 20) {
@@ -2311,40 +2400,46 @@ const soundManager = {
 		}
 		
 		const source = this.sources[type];
+		if (!source) return;
 
-		if (!source) {
-			throw new Error(`Sound of type "${type}" doesn't exist.`);
-		}
-		
-		const initialVolume = source.volume;
-		const initialPlaybackRate = MyMath.random(
-			source.playbackRateMin,
-			source.playbackRateMax
-		);
-		
-		// Volume descreases with scale.
-		const scaledVolume = initialVolume * scale;
-		// Playback rate increases with scale. For this, we map the scale of 0-1 to a scale of 2-1.
-		// So at a scale of 1, sound plays normally, but as scale approaches 0 speed approaches double.
-		const scaledPlaybackRate = initialPlaybackRate * (2 - scale);
-		
-		const gainNode = this.ctx.createGain();
-		gainNode.gain.value = scaledVolume;
+		// Play decoded buffer if available
+		if (source.buffers && source.buffers.length > 0) {
+			const buffer = MyMath.randomChoice(source.buffers);
+			if (buffer) {
+				try {
+					const initialVolume = source.volume;
+					const initialPlaybackRate = MyMath.random(
+						source.playbackRateMin,
+						source.playbackRateMax
+					);
+					const scaledVolume = initialVolume * scale;
+					const scaledPlaybackRate = initialPlaybackRate * (2 - scale);
+					
+					const gainNode = this.ctx.createGain();
+					gainNode.gain.value = scaledVolume;
 
-		const buffer = MyMath.randomChoice(source.buffers);
-		if (buffer) {
-			const bufferSource = this.ctx.createBufferSource();
-			bufferSource.playbackRate.value = scaledPlaybackRate;
-			bufferSource.buffer = buffer;
-			bufferSource.connect(gainNode);
-			gainNode.connect(this.ctx.destination);
-			bufferSource.start(0);
+					const bufferSource = this.ctx.createBufferSource();
+					bufferSource.playbackRate.value = scaledPlaybackRate;
+					bufferSource.buffer = buffer;
+					bufferSource.connect(gainNode);
+					gainNode.connect(this.ctx.destination);
+					bufferSource.start(0);
+					return;
+				} catch (e) {}
+			}
 		}
+
+		// Procedural synthesis fallback
+		this.playSynthesizedSound(type, scale);
 	}
 };
 
 // Global audio controls for modal communication
 window.startFireworksAudio = function() {
+	if (appNodes && appNodes.stageContainer) {
+		appNodes.stageContainer.classList.remove('remove');
+	}
+	handleResize();
 	store.setState({ soundEnabled: true, paused: false });
 	if (soundManager.ctx && soundManager.ctx.state !== 'running') {
 		soundManager.ctx.resume().catch(() => {});
@@ -2361,32 +2456,23 @@ window.stopFireworksAudio = function() {
 };
 
 window.addEventListener('message', function(e) {
-	if (e.data && e.data.action === 'START_FIREWORKS_AUDIO') {
+	if (e.data && (e.data.action === 'START_FIREWORKS_AUDIO' || e.data.action === 'START_FIREWORKS')) {
 		window.startFireworksAudio();
+		handleResize();
+		setTimeout(handleResize, 150);
 	} else if (e.data && e.data.action === 'STOP_FIREWORKS_AUDIO') {
 		window.stopFireworksAudio();
+	} else if (e.data && e.data.action === 'RESIZE_FIREWORKS') {
+		handleResize();
 	}
 });
-// Kick things off.
 
-function setLoadingStatus(status) {
-	document.querySelector('.loading-init__status').textContent = status;
-}
+// Kick things off immediately and synchronously!
+init();
+handleResize();
+setTimeout(handleResize, 100);
+setTimeout(handleResize, 400);
 
-if (IS_HEADER) {
-	init();
-} else {
-	// Allow status to render, then preload assets and start app.
-	setLoadingStatus('Lighting Fuses');
-	setTimeout(() => {
-		soundManager.preload()
-		.then(
-			init,
-			reason => {
-				init();
-				// setLoadingStatus('Error Loading Audio');
-				return Promise.reject(reason);
-			}
-		);
-	}, 0);
-}
+try {
+	soundManager.preload();
+} catch (e) {}
