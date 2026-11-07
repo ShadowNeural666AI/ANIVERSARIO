@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const preloaderPhrase = document.getElementById('preloader-phrase');
 
   const romanticPhases = [
-    { threshold: 0, text: "El osito preparando su cañón de amor..." },
-    { threshold: 24, text: "Disparando rayos dorados al corazón..." },
+    { threshold: 0, text: "El osito preparando sus disparos de amor..." },
+    { threshold: 24, text: "Lanzando esferas doradas directas al corazón..." },
     { threshold: 50, text: "Cargando nuestro amor al 100%..." },
     { threshold: 75, text: "Corazón amarillo lleno de magia y recuerdos..." },
     { threshold: 95, text: "¡Todo listo para ti, Estrella! ❤️" }
@@ -337,8 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         c.rotate(this.rotation);
         c.globalAlpha = Math.max(0, this.opacity);
         c.fillStyle = this.color;
-        c.shadowColor = this.color;
-        c.shadowBlur = 6;
         c.beginPath();
         const d = this.size;
         c.moveTo(0, d * 0.3);
@@ -349,8 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const petals = Array.from({ length: 30 }, () => new Petal());
-    const goldDust = Array.from({ length: 25 }, () => new GoldDust());
+    const petals = Array.from({ length: 24 }, () => new Petal());
+    const goldDust = Array.from({ length: 20 }, () => new GoldDust());
     let burstHearts = [];
 
     let isVisible = true;
@@ -359,6 +357,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function renderLoop() {
+      // Pause ambient petals when fireworks modal is active to give 100% GPU to fireworks
+      const fwModal = document.getElementById('fireworks-modal');
+      if (fwModal && fwModal.classList.contains('active')) {
+        requestAnimationFrame(renderLoop);
+        return;
+      }
+
       if (isVisible) {
         ctx.clearRect(0, 0, width, height);
 
@@ -1019,92 +1024,108 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSwipeDeck('.reasons-cards-grid', '.reason-wine-card', '#reasons-swipe-hint');
 
   /* ==========================================================================
-     10. 3D ROMANTIC LOVE ENVELOPE CONTROLLER (EFECTO CARTA ADAPTADO)
+     10. 3D ROMANTIC LOVE ENVELOPE & OVERLAY LETTER MODAL CONTROLLER
      ========================================================================== */
   const envelope = document.getElementById('romantic-envelope');
+  const letterModalBackdrop = document.getElementById('letter-modal-backdrop');
+  const closeLetterModalBtn = document.getElementById('close-letter-modal-btn');
+  const closeLetterModalBtnSecondary = document.getElementById('close-letter-modal-btn-secondary');
   const closeLetterBtn = document.getElementById('close-letter-btn');
   const closeLetterBtnSecondary = document.getElementById('close-letter-btn-secondary');
+  const btnOpenFireworksModal = document.getElementById('open-fireworks-btn-modal');
+  const btnOpenFireworks = document.getElementById('open-fireworks-btn');
+
+  let letterModalTimer = null;
 
   function openLetter() {
     if (!envelope) return;
     envelope.classList.add('is-open');
     envelope.setAttribute('aria-expanded', 'true');
+
+    // Superimpose romantic letter with darkened backdrop after envelope flip & flap opens
+    clearTimeout(letterModalTimer);
+    letterModalTimer = setTimeout(() => {
+      if (letterModalBackdrop && envelope.classList.contains('is-open')) {
+        letterModalBackdrop.classList.add('active');
+        letterModalBackdrop.setAttribute('aria-hidden', 'false');
+      }
+    }, 280);
   }
 
   function closeLetter() {
-    if (!envelope) return;
-    envelope.classList.remove('is-open');
-    envelope.setAttribute('aria-expanded', 'false');
+    clearTimeout(letterModalTimer);
+    if (letterModalBackdrop) {
+      letterModalBackdrop.classList.remove('active');
+      letterModalBackdrop.setAttribute('aria-hidden', 'true');
+    }
+    if (envelope) {
+      envelope.classList.remove('is-open');
+      envelope.setAttribute('aria-expanded', 'false');
+    }
   }
 
-  function handleCloseEvent(e) {
+  function handleCloseLetterEvent(e) {
     if (e.cancelable) e.preventDefault();
     e.stopPropagation();
     closeLetter();
   }
 
-  if (closeLetterBtn) {
-    closeLetterBtn.addEventListener('click', handleCloseEvent);
-    closeLetterBtn.addEventListener('touchend', handleCloseEvent);
+  // Close buttons bindings (✕ and secondary buttons)
+  [closeLetterModalBtn, closeLetterModalBtnSecondary, closeLetterBtn, closeLetterBtnSecondary].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', handleCloseLetterEvent);
+      btn.addEventListener('touchend', handleCloseLetterEvent);
+    }
+  });
+
+  // Clicking outside the letter card on the darkened backdrop closes the letter immediately
+  if (letterModalBackdrop) {
+    letterModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === letterModalBackdrop) {
+        closeLetter();
+      }
+    });
+
+    letterModalBackdrop.addEventListener('touchend', (e) => {
+      if (e.target === letterModalBackdrop) {
+        closeLetter();
+      }
+    }, { passive: true });
   }
 
-  if (closeLetterBtnSecondary) {
-    closeLetterBtnSecondary.addEventListener('click', handleCloseEvent);
-    closeLetterBtnSecondary.addEventListener('touchend', handleCloseEvent);
-  }
-
+  // Envelope interactions
   if (envelope) {
     envelope.addEventListener('click', (e) => {
-      // If user clicked any close button inside the letter
+      // If user clicked any close button or celebration button
       if (e.target.closest('#close-letter-btn') || e.target.closest('#close-letter-btn-secondary')) {
-        e.stopPropagation();
         closeLetter();
         return;
       }
-
-      // If user clicked the celebrate fireworks button
       if (e.target.closest('#open-fireworks-btn')) {
         return;
       }
 
-      // If envelope is open:
       if (envelope.classList.contains('is-open')) {
-        // If user clicked inside reading content, keep it open for reading & scrolling
-        if (e.target.closest('.letter-inner-content')) {
-          return;
-        }
-        // Clicking anywhere else on the envelope or letter margins closes it immediately
+        if (e.target.closest('.letter-inner-content')) return;
         closeLetter();
       } else {
-        // If envelope is closed: opening it immediately
         openLetter();
       }
     });
 
     // Close when tapping outside the envelope on desktop or mobile
     document.addEventListener('click', (e) => {
-      if (envelope && envelope.classList.contains('is-open')) {
+      if (envelope && envelope.classList.contains('is-open') && !letterModalBackdrop?.classList.contains('active')) {
         if (!envelope.contains(e.target)) {
           closeLetter();
         }
       }
     });
 
-    document.addEventListener('touchend', (e) => {
-      if (envelope && envelope.classList.contains('is-open')) {
-        if (e.target.closest('#close-letter-btn') || e.target.closest('#close-letter-btn-secondary')) {
-          return;
-        }
-        if (!envelope.contains(e.target)) {
-          closeLetter();
-        }
-      }
-    }, { passive: true });
-
-    // Keyboard accessibility (Enter / Space opens/closes the envelope, Escape closes)
+    // Keyboard accessibility (Escape closes modal or envelope, Enter/Space toggles envelope)
     window.addEventListener('keydown', (e) => {
-      if (envelope && envelope.classList.contains('is-open')) {
-        if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
+        if (letterModalBackdrop?.classList.contains('active') || envelope?.classList.contains('is-open')) {
           closeLetter();
         }
       }
@@ -1127,7 +1148,6 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   const fireworksModal = document.getElementById('fireworks-modal');
   const fireworksModalClose = document.getElementById('fireworks-modal-close');
-  const btnOpenFireworks = document.getElementById('open-fireworks-btn');
 
   let wasMusicPlayingBeforeFireworks = false;
 
@@ -1182,12 +1202,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (btnOpenFireworks) {
-    btnOpenFireworks.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openFireworksShow();
-    });
-  }
+  [btnOpenFireworks, btnOpenFireworksModal].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openFireworksShow();
+      });
+    }
+  });
 
   if (fireworksModalClose) {
     fireworksModalClose.addEventListener('click', (e) => {

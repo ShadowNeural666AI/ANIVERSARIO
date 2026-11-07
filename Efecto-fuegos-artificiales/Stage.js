@@ -44,7 +44,6 @@ const Ticker = (function TickerFactory(window) {
 
 	const Ticker = {};
 
-
 	// public
 	// will call function reference repeatedly once registered, passing elapsed time and a lag multiplier as parameters
 	Ticker.addListener = function addListener(callback) {
@@ -52,28 +51,53 @@ const Ticker = (function TickerFactory(window) {
 
 		listeners.push(callback);
 
-		// start frame-loop lazily
+		// only start frame-loop if modal is active or standalone
+		const modal = document.getElementById('fireworks-modal');
+		if (!modal || modal.classList.contains('active')) {
+			Ticker.start();
+		}
+	};
+
+	Ticker.start = function start() {
 		if (!started) {
 			started = true;
+			lastTimestamp = performance.now();
 			queueFrame();
+		}
+	};
+
+	Ticker.stop = function stop() {
+		started = false;
+		if (rafId) {
+			if (window.cancelAnimationFrame) cancelAnimationFrame(rafId);
+			rafId = null;
 		}
 	};
 
 	// private
 	let started = false;
+	let rafId = null;
 	let lastTimestamp = 0;
 	let listeners = [];
 
 	// queue up a new frame (calls frameHandler)
 	function queueFrame() {
+		if (!started) return;
 		if (window.requestAnimationFrame) {
-			requestAnimationFrame(frameHandler);
+			rafId = requestAnimationFrame(frameHandler);
 		} else {
-			webkitRequestAnimationFrame(frameHandler);
+			rafId = webkitRequestAnimationFrame(frameHandler);
 		}
 	}
 
 	function frameHandler(timestamp) {
+		const modal = document.getElementById('fireworks-modal');
+		if (modal && !modal.classList.contains('active')) {
+			started = false;
+			rafId = null;
+			return;
+		}
+
 		let frameTime = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 		// make sure negative time isn't reported (first frame can be whacky)
@@ -88,10 +112,11 @@ const Ticker = (function TickerFactory(window) {
 		// fire custom listeners
 		listeners.forEach(listener => listener.call(window, frameTime, frameTime / 16.6667));
 
-		// always queue another frame
-		queueFrame();
+		// always queue another frame if still started
+		if (started) {
+			queueFrame();
+		}
 	}
-
 
 	return Ticker;
 
@@ -119,9 +144,8 @@ const Stage = (function StageFactory(window, document, Ticker) {
 		// physics speed multiplier: allows slowing down or speeding up simulation (must be manually implemented in physics layer)
 		this.speed = 1;
 
-		// devicePixelRatio alias (should only be used for rendering, physics shouldn't care)
-		// avoids rendering unnecessary pixels that browser might handle natively via CanvasRenderingContext2D.backingStorePixelRatio
-		this.dpr = Stage.disableHighDPI ? 1 : ((window.devicePixelRatio || 1) / (this.ctx.backingStorePixelRatio || 1));
+		// devicePixelRatio alias (capped to prevent 180MB+ memory allocations on mobile)
+		this.dpr = Stage.disableHighDPI ? 1 : Math.min(((window.devicePixelRatio || 1) / (this.ctx.backingStorePixelRatio || 1)), 1.2);
 
 		// canvas size in DIPs and natural pixels
 		this.width = canvas.width;
@@ -175,10 +199,8 @@ const Stage = (function StageFactory(window, document, Ticker) {
 	// track all Stage instances
 	Stage.stages = [];
 
-	// allow turning off high DPI support for perf reasons (enabled by default)
-	// Note: MUST be set before Stage construction.
-	//       Each stage tracks its own DPI (initialized at construction time), so you can effectively allow some Stages to render high-res graphics but not others.
-	Stage.disableHighDPI = false;
+	// allow turning off high DPI support for perf reasons (disabled by default to prevent browser freezes)
+	Stage.disableHighDPI = true;
 
 	// events
 	Stage.prototype.addEventListener = function addEventListener(event, handler) {

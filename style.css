@@ -372,102 +372,89 @@ body {
   }
 }
 
-/* Energy Beam Flowing from Bear to Heart */
-.beam-glow-line {
-  stroke-dasharray: 8 6;
-  animation: beam-flow 0.5s linear infinite;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.6));
-}
-
-.beam-core-line {
-  stroke-dasharray: 12 8;
-  animation: beam-flow-reverse 0.35s linear infinite;
-}
-
-@keyframes beam-flow {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -28; }
-}
-
-@keyframes beam-flow-reverse {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -40; }
-}
-
-/* Streaming Charging Projectiles (Hearts and Stars) */
-.stream-projectile {
-  animation-duration: 0.75s;
+/* ==========================================================================
+   FLYING ENERGY BALLS (BOLITAS DE AMOR) DISPARADAS DEL OSO AL CORAZÓN
+   ========================================================================== */
+.energy-ball-orb {
+  will-change: transform, opacity;
+  animation-duration: 0.82s;
   animation-iteration-count: infinite;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.proj-1 {
-  animation-name: fly-proj-1;
-}
-.proj-2 {
-  animation-name: fly-proj-2;
-  animation-delay: 0.18s;
-}
-.proj-3 {
-  animation-name: fly-proj-3;
-  animation-delay: 0.38s;
-}
-.proj-4 {
-  animation-name: fly-proj-4;
-  animation-delay: 0.56s;
+.energy-ball-orb.ball-1 {
+  animation-name: shoot-energy-ball;
+  animation-delay: 0s;
 }
 
-@keyframes fly-proj-1 {
-  0%   { transform: translate(178px, 108px) scale(0.4); opacity: 0; }
-  20%  { opacity: 1; }
-  85%  { opacity: 1; }
-  100% { transform: translate(346px, 108px) scale(1.2); opacity: 0; }
+.energy-ball-orb.ball-2 {
+  animation-name: shoot-energy-ball;
+  animation-delay: 0.27s;
 }
 
-@keyframes fly-proj-2 {
-  0%   { transform: translate(178px, 108px) scale(0.3); opacity: 0; }
-  20%  { opacity: 1; }
-  85%  { opacity: 1; }
-  100% { transform: translate(346px, 108px) scale(1.3); opacity: 0; }
+.energy-ball-orb.ball-3 {
+  animation-name: shoot-energy-ball;
+  animation-delay: 0.54s;
 }
 
-@keyframes fly-proj-3 {
-  0%   { transform: translate(178px, 108px) scale(0.4); opacity: 0; }
-  20%  { opacity: 1; }
-  85%  { opacity: 1; }
-  100% { transform: translate(346px, 108px) scale(1.1); opacity: 0; }
+@keyframes shoot-energy-ball {
+  0% {
+    transform: translate(178px, 108px) scale(0.35);
+    opacity: 0;
+  }
+  12% {
+    transform: translate(195px, 108px) scale(0.85);
+    opacity: 1;
+  }
+  85% {
+    transform: translate(335px, 108px) scale(1.1);
+    opacity: 1;
+  }
+  96% {
+    transform: translate(350px, 108px) scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(354px, 108px) scale(1.4);
+    opacity: 0;
+  }
 }
 
-@keyframes fly-proj-4 {
-  0%   { transform: translate(178px, 108px) scale(0.3); opacity: 0; }
-  20%  { opacity: 1; }
-  85%  { opacity: 1; }
-  100% { transform: translate(346px, 108px) scale(1.2); opacity: 0; }
+/* Collision Impact Burst at Heart Surface (352, 108) */
+.heart-collision-impact {
+  transform-origin: 352px 108px;
+  animation: collision-impact-burst 0.27s infinite alternate ease-out;
 }
 
-/* Impact Rings at Heart Surface */
-.beam-impact-burst {
-  transform-origin: 346px 108px;
+@keyframes collision-impact-burst {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
 }
 
-.impact-ring-1 {
-  transform-origin: 346px 108px;
-  animation: impact-pulse-1 0.45s infinite ease-out;
+.impact-ring {
+  transform-origin: 352px 108px;
+  animation: impact-ring-expand 0.54s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
 }
 
-.impact-ring-2 {
-  transform-origin: 346px 108px;
-  animation: impact-pulse-2 0.45s infinite 0.22s ease-out;
-}
-
-@keyframes impact-pulse-1 {
-  0%   { transform: scale(0.4); opacity: 1; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
-@keyframes impact-pulse-2 {
-  0%   { transform: scale(0.4); opacity: 0.9; }
-  100% { transform: scale(2.6); opacity: 0; }
+@keyframes impact-ring-expand {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 
 /* Charging Yellow Heart Ambient Glow */
@@ -477,8 +464,8 @@ body {
 }
 
 @keyframes yellow-heart-thump {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.75)); }
-  50%      { transform: scale(1.035); filter: drop-shadow(0 0 28px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 45px rgba(245, 158, 11, 0.65)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7)); }
+  50%      { transform: scale(1.035); filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.9)); }
 }
 
 /* Liquid Bubbles Rising */
@@ -2253,6 +2240,89 @@ body {
 }
 
 /* ==========================================================================
+   SUPERIMPOSED ROMANTIC LETTER MODAL (FONDO OSCURECIDO Y CARTA SOBREPUESTA)
+   ========================================================================== */
+.letter-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(6, 1, 3, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.letter-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.letter-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 490px;
+  max-height: 86vh;
+  background: linear-gradient(135deg, #fffef9 0%, #fff7eb 50%, #faecd8 100%);
+  border: 1.8px solid #d4af37;
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.94), 0 0 35px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(212, 175, 55, 0.14);
+  padding: 34px 28px 28px 28px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  transform: scale(0.9) translateY(24px);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-border) transparent;
+}
+
+.letter-modal-backdrop.active .letter-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.letter-modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff4d6d, #b5173f 60%, #4a0718 100%);
+  border: 2px solid #ffd700;
+  color: #fff9e6;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 215, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.letter-modal-close-btn:hover,
+.letter-modal-close-btn:active {
+  transform: scale(1.15);
+  filter: brightness(1.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+/* ==========================================================================
    FIREWORKS FULLSCREEN MODAL (Efecto-fuegos-artificiales)
    ========================================================================== */
 .fireworks-modal-backdrop {
@@ -3437,6 +3507,19 @@ body {
     font-size: 0.78rem;
     padding: 7px 16px;
   }
+
+  .letter-modal-card {
+    padding: 28px 18px 22px 18px;
+    max-height: 88vh;
+  }
+
+  .letter-modal-close-btn {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
 }
 
 @media (min-width: 769px) {
@@ -3608,5 +3691,18 @@ body {
   .letter-celebrate-btn {
     font-size: 0.74rem;
     padding: 6px 14px;
+  }
+
+  .letter-modal-card {
+    padding: 24px 14px 18px 14px;
+    max-height: 89vh;
+  }
+
+  .letter-modal-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
   }
 }

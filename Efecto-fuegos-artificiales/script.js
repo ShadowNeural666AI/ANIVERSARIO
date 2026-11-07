@@ -58,7 +58,7 @@ const INVISIBLE = '_INVISIBLE_';
 const PI_2 = Math.PI * 2;
 const PI_HALF = Math.PI * 0.5;
 
-// Stage.disableHighDPI = true;
+Stage.disableHighDPI = true;
 const trailsStage = new Stage('trails-canvas');
 const mainStage = new Stage('main-canvas');
 const stages = [
@@ -281,7 +281,11 @@ function configDidUpdate() {
 // Selectors
 // -----------
 
-const isRunning = (state=store.state) => !state.paused && !state.menuOpen;
+const isRunning = (state=store.state) => {
+	const modal = document.getElementById('fireworks-modal');
+	if (modal && !modal.classList.contains('active')) return false;
+	return !state.paused && !state.menuOpen;
+};
 // Whether user has enabled sound.
 const soundEnabledSelector = (state=store.state) => state.soundEnabled;
 // Whether any sounds are allowed, taking into account multiple factors.
@@ -2410,6 +2414,9 @@ window.startFireworks = function() {
 	handleResize();
 	togglePause(false);
 	store.setState({ soundEnabled: true, paused: false });
+	if (typeof Ticker !== 'undefined' && Ticker.start) {
+		Ticker.start();
+	}
 	if (soundManager.ctx && soundManager.ctx.state !== 'running') {
 		soundManager.ctx.resume().catch(() => {});
 	}
@@ -2424,6 +2431,9 @@ window.startFireworks = function() {
 window.stopFireworks = function() {
 	togglePause(true);
 	store.setState({ soundEnabled: false, paused: true });
+	if (typeof Ticker !== 'undefined' && Ticker.stop) {
+		Ticker.stop();
+	}
 	soundManager.pauseAll();
 	if (soundManager.ctx && soundManager.ctx.state === 'running') {
 		soundManager.ctx.suspend().catch(() => {});

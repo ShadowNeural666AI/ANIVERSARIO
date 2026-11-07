@@ -77,14 +77,20 @@
               <stop offset="100%" stop-color="transparent" />
             </radialGradient>
 
-            <!-- Charging Energy Beam Gradient -->
-            <linearGradient id="energy-beam-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <!-- Energy Ball Projectile Gradients -->
+            <radialGradient id="energy-ball-core" cx="35%" cy="35%" r="65%">
               <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="25%" stop-color="#fff066" />
+              <stop offset="30%" stop-color="#fff5b8" />
               <stop offset="60%" stop-color="#ffd700" />
               <stop offset="85%" stop-color="#f59e0b" />
-              <stop offset="100%" stop-color="#ffffff" />
-            </linearGradient>
+              <stop offset="100%" stop-color="#b45309" />
+            </radialGradient>
+            <radialGradient id="energy-ball-aura" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="35%" stop-color="#ffd700" stop-opacity="0.8" />
+              <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="transparent" />
+            </radialGradient>
 
             <!-- Golden Heart Liquid Fill Gradient (Radiant Molten Yellow/Gold) -->
             <linearGradient id="yellow-liquid-grad" x1="0%" y1="100%" x2="0%" y2="0%">
@@ -108,11 +114,9 @@
               <path d="M 405, 78 C 392, 52 358, 52 346, 80 C 334, 108 355, 142 405, 175 C 455, 142 476, 108 464, 80 C 452, 52 418, 52 405, 78 Z" />
             </clipPath>
 
-            <!-- Filter Glow for Golden Heart -->
-            <filter id="heart-gold-radiance" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ffd700" flood-opacity="0.9" />
-              <feDropShadow dx="0" dy="4" stdDeviation="16" flood-color="#f59e0b" flood-opacity="0.6" />
-              <feDropShadow dx="0" dy="12" stdDeviation="28" flood-color="#000000" flood-opacity="0.8" />
+            <!-- Filter Glow for Golden Heart (Optimized for 60 FPS) -->
+            <filter id="heart-gold-radiance" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#ffd700" flood-opacity="0.75" />
             </filter>
           </defs>
 
@@ -208,25 +212,44 @@
             </g>
           </g>
 
-          <!-- ==================== 2. FLYING ENERGY BEAM & CHARGING PARTICLES ==================== -->
-          <g class="charging-beam-stream">
-            <!-- Ambient Golden Glow Path -->
-            <path d="M 178,108 C 235,98 290,118 346,108" fill="none" stroke="url(#energy-beam-grad)" stroke-width="6" stroke-linecap="round" class="beam-glow-line" />
-            <!-- Core Bright White Laser Filament -->
-            <path d="M 178,108 C 235,98 290,118 346,108" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" class="beam-core-line" />
+          <!-- ==================== 2. FLYING ENERGY BALL PROJECTILES (BOLITAS DE AMOR) ==================== -->
+          <g class="charging-energy-balls-stream">
+            <!-- Energy Ball 1 -->
+            <g class="energy-ball-orb ball-1">
+              <ellipse cx="-8" cy="0" rx="14" ry="4.5" fill="url(#energy-ball-aura)" opacity="0.85" />
+              <circle cx="0" cy="0" r="14" fill="url(#energy-ball-aura)" />
+              <circle cx="0" cy="0" r="9" fill="url(#energy-ball-core)" stroke="#fffbe0" stroke-width="1.2" />
+              <circle cx="-2.5" cy="-2.5" r="3.2" fill="#ffffff" />
+              <path d="M 0,-2.5 C -1.2,-4 -3,-3 -3,-1.2 C -3,1 0,3 0,3 C 0,3 3,1 3,-1.2 C 3,-3 1.2,-4 0,-2.5 Z" fill="#ffffff" opacity="0.9" />
+            </g>
 
-            <!-- Floating Charging Projectiles (Hearts & Stars streaming into the Heart) -->
-            <g class="stream-projectile proj-1">
-              <path d="M 0,-5 C -3,-8 -7,-5 -7,0 C -7,5 0,9 0,9 C 0,9 7,5 7,0 C 7,-5 3,-8 0,-5 Z" fill="#ffd700" filter="drop-shadow(0 0 5px #ffea66)" />
+            <!-- Energy Ball 2 -->
+            <g class="energy-ball-orb ball-2">
+              <ellipse cx="-8" cy="0" rx="14" ry="4.5" fill="url(#energy-ball-aura)" opacity="0.85" />
+              <circle cx="0" cy="0" r="14" fill="url(#energy-ball-aura)" />
+              <circle cx="0" cy="0" r="8.5" fill="url(#energy-ball-core)" stroke="#fffbe0" stroke-width="1.2" />
+              <circle cx="-2.5" cy="-2.5" r="3" fill="#ffffff" />
+              <polygon points="0,-4 1.2,-1 4,0 1.2,1 0,4 -1.2,1 -4,0 -1.2,-1" fill="#ffffff" opacity="0.95" />
             </g>
-            <g class="stream-projectile proj-2">
-              <text x="0" y="4" text-anchor="middle" font-size="14" fill="#fff5db" filter="drop-shadow(0 0 6px #ffd700)">✦</text>
+
+            <!-- Energy Ball 3 -->
+            <g class="energy-ball-orb ball-3">
+              <ellipse cx="-8" cy="0" rx="14" ry="4.5" fill="url(#energy-ball-aura)" opacity="0.85" />
+              <circle cx="0" cy="0" r="14" fill="url(#energy-ball-aura)" />
+              <circle cx="0" cy="0" r="9" fill="url(#energy-ball-core)" stroke="#fffbe0" stroke-width="1.2" />
+              <circle cx="-2.5" cy="-2.5" r="3.2" fill="#ffffff" />
+              <path d="M 0,-2.5 C -1.2,-4 -3,-3 -3,-1.2 C -3,1 0,3 0,3 C 0,3 3,1 3,-1.2 C 3,-3 1.2,-4 0,-2.5 Z" fill="#ffffff" opacity="0.9" />
             </g>
-            <g class="stream-projectile proj-3">
-              <path d="M 0,-4 C -2,-6 -5,-4 -5,0 C -5,4 0,7 0,7 C 0,7 5,4 5,0 C 5,-4 2,-6 0,-4 Z" fill="#ffea66" filter="drop-shadow(0 0 5px #ffd700)" />
-            </g>
-            <g class="stream-projectile proj-4">
-              <text x="0" y="4" text-anchor="middle" font-size="12" fill="#ffffff" filter="drop-shadow(0 0 6px #ffd700)">✧</text>
+
+            <!-- Collision Impact Point at the Heart (352, 108) -->
+            <g class="heart-collision-impact">
+              <circle cx="352" cy="108" r="18" fill="url(#muzzle-glow)" opacity="0.85" />
+              <circle cx="352" cy="108" r="10" fill="none" stroke="#fff9b3" stroke-width="2" opacity="0.9" class="impact-ring" />
+              <circle cx="352" cy="108" r="4.5" fill="#ffffff" />
+              <polygon points="352,94 355,104 366,108 355,112 352,122 349,112 338,108 349,104" fill="#ffffff" opacity="0.95" />
+              <circle cx="358" cy="102" r="2.2" fill="#ffd700" />
+              <circle cx="360" cy="115" r="2" fill="#ffea66" />
+              <circle cx="346" cy="116" r="1.8" fill="#ffd700" />
             </g>
           </g>
 
@@ -1234,8 +1257,58 @@
   </div>
 
   <!-- ======================================================================
-       CELEBRATION FIREWORKS FULLSCREEN MODAL (Efecto-fuegos-artificiales)
+       ROMANTIC LETTER SUPERIMPOSED MODAL OVERLAY (FONDO OSCURECIDO)
        ====================================================================== -->
+  <div id="letter-modal-backdrop" class="letter-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Carta de amor de Aron para Estrella">
+    <div class="letter-modal-card" id="letter-modal-card">
+      <!-- Floating Close Button for Letter (Prominent ✕) -->
+      <button class="letter-modal-close-btn" id="close-letter-modal-btn" type="button" aria-label="Cerrar carta" title="Cerrar carta">✕</button>
+
+      <div class="letter-inner-content">
+        <div class="letter-header-filigree">
+          <span class="letter-filigree-line"></span>
+          <span class="letter-filigree-heart">♡</span>
+          <span class="letter-filigree-line"></span>
+        </div>
+
+        <h3 class="letter-heading">Mi niña hermosa,</h3>
+
+        <p class="letter-quote">
+          «Tú justificas mi existencia: si no te conozco, no he vivido; si muero sin conocerte, no muero,
+          porque no he vivido.»
+        </p>
+
+        <p class="letter-body-p">
+          Eres mi alegría, mi lugar favorito, mi persona en la que siempre confío. Gracias por existir,
+          por caminar a mi lado estos 3 años y por hacer que cada día sea más bonito.
+        </p>
+
+        <p class="letter-closing">
+          Te amo hoy, mañana y siempre.
+        </p>
+
+        <div class="letter-signature-block">
+          <span class="sig-cursive">Con todo mi amor,</span>
+          <span class="sig-name">Aron ♡</span>
+        </div>
+
+        <!-- Actions: Celebration button & Secondary Close button -->
+        <div class="letter-actions-group">
+          <button class="letter-celebrate-btn" id="open-fireworks-btn-modal" type="button"
+            title="Ver fuegos artificiales de celebración">
+            <span class="btn-sparkle">✨</span>
+            <span>¡Celebrar Nuestro Amor!</span>
+            <span class="btn-sparkle">🎆</span>
+          </button>
+          <button class="letter-secondary-close-btn" id="close-letter-modal-btn-secondary" type="button"
+            aria-label="Cerrar carta">
+            <span>Cerrar carta ♡</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ======================================================================
        CELEBRATION FIREWORKS FULLSCREEN MODAL (NATIVO - EFECTO FUEGOS ARTIFICIALES)
        ====================================================================== -->
