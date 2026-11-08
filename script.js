@@ -942,11 +942,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const deltaX = currentX - startX;
       const deltaY = currentY - startY;
 
-      if (Math.abs(deltaX) > 12) {
+      // Only swipe horizontally if movement is more horizontal than vertical
+      if (Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
         hasMovedFar = true;
+        activeCard.style.transform = `translate3d(${deltaX}px, ${deltaY * 0.15}px, 0) rotate(${deltaX * 0.08}deg)`;
       }
-
-      activeCard.style.transform = `translate3d(${deltaX}px, ${deltaY * 0.25}px, 0) rotate(${deltaX * 0.08}deg)`;
     }, { passive: true });
 
     container.addEventListener('touchend', () => {
@@ -1089,13 +1089,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clicking outside the letter card on the darkened backdrop closes the letter immediately
   if (letterModalBackdrop) {
     letterModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === letterModalBackdrop) {
+      if (!e.target.closest('.letter-modal-card')) {
         closeLetter();
       }
     });
 
     letterModalBackdrop.addEventListener('touchend', (e) => {
-      if (e.target === letterModalBackdrop) {
+      if (!e.target.closest('.letter-modal-card')) {
         closeLetter();
       }
     }, { passive: true });

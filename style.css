@@ -54,24 +54,35 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   background-color: var(--bg-dark);
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-dark);
+  color: var(--text-cream);
+  min-height: 100vh;
+  overflow-x: clip;
+  position: relative;
+  line-height: 1.6;
+}
+
+/* Hardware-Accelerated Fixed Wallpaper Background (0 Paint Lag during Scroll) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   background-image: 
     radial-gradient(circle at 50% 8%, #3c0922 0%, #1c030d 45%, #0c0106 100%),
     radial-gradient(circle at 20% 35%, rgba(68, 10, 36, 0.35) 0%, transparent 55%),
     radial-gradient(circle at 80% 65%, rgba(68, 10, 36, 0.35) 0%, transparent 55%),
     radial-gradient(circle at 50% 90%, rgba(55, 8, 28, 0.4) 0%, transparent 60%);
-  background-attachment: fixed;
-  color: var(--text-cream);
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-  line-height: 1.6;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateZ(0);
 }
 
 /* Background Ambient Canvas (Falling Rose Petals & Golden Glow Dust) */
@@ -2255,12 +2266,14 @@ body {
   padding: 20px 16px;
   box-sizing: border-box;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.35s ease;
 }
 
 .letter-modal-backdrop.active {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
@@ -2291,16 +2304,19 @@ body {
 }
 
 .letter-modal-close-btn {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 40px;
-  height: 40px;
+  position: sticky;
+  top: 6px;
+  align-self: flex-end;
+  margin-top: -16px;
+  margin-right: -12px;
+  margin-bottom: -32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #ff4d6d, #b5173f 60%, #4a0718 100%);
   border: 2px solid #ffd700;
   color: #fff9e6;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1;
   display: flex;
@@ -2309,7 +2325,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 215, 0, 0.5);
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
-  z-index: 10;
+  z-index: 50;
   -webkit-tap-highlight-color: transparent;
 }
 
