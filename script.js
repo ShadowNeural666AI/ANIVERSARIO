@@ -574,46 +574,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     7. 3D INTERACTIVE PARALLAX TILT PHYSICS (Throttled with rAF)
+     7. 3D INTERACTIVE PARALLAX TILT PHYSICS (Throttled with rAF, Desktop Only)
      ========================================================================== */
-  const tiltElements = document.querySelectorAll('[data-tilt]');
-  tiltElements.forEach(el => {
-    let bounds = null;
-    let tiltTicking = false;
-    let rotX = 0, rotY = 0;
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const tiltElements = document.querySelectorAll('[data-tilt]');
+    tiltElements.forEach(el => {
+      let bounds = null;
+      let tiltTicking = false;
+      let rotX = 0, rotY = 0;
 
-    function updateBounds() {
-      bounds = el.getBoundingClientRect();
-    }
-
-    el.addEventListener('mouseenter', updateBounds, { passive: true });
-
-    el.addEventListener('mousemove', (e) => {
-      if (!bounds) updateBounds();
-      const mouseX = e.clientX - bounds.left;
-      const mouseY = e.clientY - bounds.top;
-
-      const xPct = (mouseX / bounds.width - 0.5) * 2;
-      const yPct = (mouseY / bounds.height - 0.5) * 2;
-
-      const maxRotate = 7.5;
-      rotX = (-yPct * maxRotate).toFixed(2);
-      rotY = (xPct * maxRotate).toFixed(2);
-
-      if (!tiltTicking) {
-        requestAnimationFrame(() => {
-          el.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
-          tiltTicking = false;
-        });
-        tiltTicking = true;
+      function updateBounds() {
+        bounds = el.getBoundingClientRect();
       }
-    }, { passive: true });
 
-    el.addEventListener('mouseleave', () => {
-      bounds = null;
-      el.style.transform = '';
-    }, { passive: true });
-  });
+      el.addEventListener('mouseenter', updateBounds, { passive: true });
+
+      el.addEventListener('mousemove', (e) => {
+        if (!bounds) updateBounds();
+        const mouseX = e.clientX - bounds.left;
+        const mouseY = e.clientY - bounds.top;
+
+        const xPct = (mouseX / bounds.width - 0.5) * 2;
+        const yPct = (mouseY / bounds.height - 0.5) * 2;
+
+        const maxRotate = 7.5;
+        rotX = (-yPct * maxRotate).toFixed(2);
+        rotY = (xPct * maxRotate).toFixed(2);
+
+        if (!tiltTicking) {
+          requestAnimationFrame(() => {
+            el.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
+            tiltTicking = false;
+          });
+          tiltTicking = true;
+        }
+      }, { passive: true });
+
+      el.addEventListener('mouseleave', () => {
+        bounds = null;
+        el.style.transform = '';
+      }, { passive: true });
+    });
+  }
 
   /* ==========================================================================
      8. 3D FAN COVERFLOW CAROUSEL & POLAROID LIGHTBOX (NUESTROS MEJORES MOMENTOS)
@@ -791,29 +793,35 @@ document.addEventListener('DOMContentLoaded', () => {
      9. REALISTIC FLOATING HEARTS MULTI-PLANE PARALLAX & CLICK BURST (rAF Throttled)
      ========================================================================== */
   const floatingHearts = document.querySelectorAll('.floating-heart-icon');
-  let heartTicking = false;
-  let mouseClientX = 0, mouseClientY = 0;
+  const heartsData = Array.from(floatingHearts).map(heart => ({
+    el: heart,
+    depth: parseFloat(heart.getAttribute('data-depth')) || 0.25
+  }));
 
-  window.addEventListener('mousemove', (e) => {
-    mouseClientX = e.clientX;
-    mouseClientY = e.clientY;
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let heartTicking = false;
+    let mouseClientX = 0, mouseClientY = 0;
 
-    if (!heartTicking) {
-      requestAnimationFrame(() => {
-        const xPct = (mouseClientX / window.innerWidth - 0.5) * 2;
-        const yPct = (mouseClientY / window.innerHeight - 0.5) * 2;
+    window.addEventListener('mousemove', (e) => {
+      mouseClientX = e.clientX;
+      mouseClientY = e.clientY;
 
-        floatingHearts.forEach(heart => {
-          const depth = parseFloat(heart.getAttribute('data-depth')) || 0.25;
-          const moveX = xPct * depth * 22;
-          const moveY = yPct * depth * 22;
-          heart.style.transform = `translate3d(${moveX.toFixed(1)}px, ${moveY.toFixed(1)}px, 0)`;
+      if (!heartTicking) {
+        requestAnimationFrame(() => {
+          const xPct = (mouseClientX / window.innerWidth - 0.5) * 2;
+          const yPct = (mouseClientY / window.innerHeight - 0.5) * 2;
+
+          heartsData.forEach(item => {
+            const moveX = xPct * item.depth * 22;
+            const moveY = yPct * item.depth * 22;
+            item.el.style.transform = `translate3d(${moveX.toFixed(1)}px, ${moveY.toFixed(1)}px, 0)`;
+          });
+          heartTicking = false;
         });
-        heartTicking = false;
-      });
-      heartTicking = true;
-    }
-  }, { passive: true });
+        heartTicking = true;
+      }
+    }, { passive: true });
+  }
 
   floatingHearts.forEach(heart => {
     heart.addEventListener('click', (e) => {

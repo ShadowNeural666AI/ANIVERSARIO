@@ -235,17 +235,25 @@ const Stage = (function StageFactory(window, document, Ticker) {
 		this.canvas.height = this.naturalHeight;
 		this.canvas.style.width = w + 'px';
 		this.canvas.style.height = h + 'px';
+		this.canvas._bbox = null;
 
 		this.dispatchEvent('resize');
 	};
 
-	// utility function for coordinate space conversion
+	// utility function for coordinate space conversion (cached to prevent layout thrashing)
 	Stage.windowToCanvas = function windowToCanvas(canvas, x, y) {
-		const bbox = canvas.getBoundingClientRect();
+		const now = performance.now();
+		if (!canvas._bbox || now - (canvas._bboxTime || 0) > 400) {
+			canvas._bbox = canvas.getBoundingClientRect();
+			canvas._bboxTime = now;
+		}
+		const bbox = canvas._bbox;
+		const w = bbox.width || canvas.width || 1;
+		const h = bbox.height || canvas.height || 1;
 		return {
-				x: (x - bbox.left) * (canvas.width / bbox.width),
-				y: (y - bbox.top) * (canvas.height / bbox.height)
-			   };
+			x: (x - bbox.left) * (canvas.width / w),
+			y: (y - bbox.top) * (canvas.height / h)
+		};
 	};
 	// handle interaction
 	Stage.mouseHandler = function mouseHandler(evt) {
